@@ -7,6 +7,7 @@ import { useHistory, Record, HistoryHook } from "../hooks/useHistory";
 import { useEffect, useRef, useState } from "react";
 import { detectLang } from "../providers/openai/lang";
 import { v4 as uuidv4 } from "uuid";
+import { getLoadActionSection } from "../actions/load";
 
 export interface ContentViewProps {
   query: QueryHook,
@@ -44,10 +45,29 @@ export const ContentView = (props: ContentViewProps) => {
     }
   }
 
+  function onTranslationError(toast: Toast, from: string, title: string, message: string){
+    toast.title = title,
+    toast.message =  message
+    toast.style = Toast.Style.Failure;
+    const record: Record = {
+      id: uuidv4(),
+      created_at: new Date().toISOString(),
+      result: {
+        from,
+        to: query.to,
+        original: query.text,
+        text: ref.current,
+        error: message
+      }
+    }
+    history.add(record)
+    query.updateQuerying(false)
+  }
+
   async function doQuery() {
     const controller = new AbortController()
     const { signal } = controller
-    const detectFrom: string = (await detectLang(query.text)) ?? 'en'
+    const detectFrom: string = query.from == "auto" ? ((await detectLang(query.text)) ?? 'en') : query.from
     const toast = await showToast({
       title: "Getting your translation...",
       style: Toast.Style.Animated,
@@ -73,37 +93,31 @@ export const ContentView = (props: ContentViewProps) => {
         onFinish: (reason) => {
           toast.title = "Got your translation!";
           toast.style = Toast.Style.Success;
-          const record: Record = {
-            id: uuidv4(),
-            created_at: new Date().toISOString(),
-            result: {
-              from: detectFrom,
-              to: detectTo,
-              original: text,
-              text: ref.current,
+          if (reason !== 'stop') {
+            onTranslationError(toast, detectFrom, "Error", `failed：${reason}`)
+          } else {
+            if(ref.current){
+              const newText = ['”', '"', '」'].indexOf(ref.current[ref.current.length - 1]) >= 0  // FIXME 避免显性引用
+                ? ref.current.slice(0, -1)
+                : ref.current
+              setTranslatedText(newText)
+              const record: Record = {
+                id: uuidv4(),
+                created_at: new Date().toISOString(),
+                result: {
+                  from: detectFrom,
+                  to: detectTo,
+                  original: text,
+                  text: newText
+                }
+              }
+              history.add(record)
             }
+            query.updateQuerying(false)
           }
-          history.add(record)
-          query.updateQuerying(false)
         },
         onError: (error) => {
-          console.log(error)
-          toast.title = "Error";
-          toast.message = error;
-          toast.style = Toast.Style.Failure;
-          const record: Record = {
-            id: uuidv4(),
-            created_at: new Date().toISOString(),
-            result: {
-              from: detectFrom,
-              to: query.to,
-              original: query.text,
-              text: ref.current,
-              error: error
-            }
-          }
-          history.add(record)
-          query.updateQuerying(false)
+          onTranslationError(toast, detectFrom, "Error", error)
         },
       },
       id: "querying"
@@ -139,12 +153,25 @@ export const ContentView = (props: ContentViewProps) => {
   const getRecordActionPanel = (record: Record) => (
     <ActionPanel>
       {
-        query.text && (<Action title="Translate Item" onAction={() => query.updateQuerying(true)} />)
+        query.text && (<Action
+                         title="Translate"
+                         icon={Icon.Book}
+                         onAction={() => query.updateQuerying(true)} />)
       }
+      <Action
+        title={`Switch to Translate ${query.langType == "To" ? "From" : "To"}`}
+        icon={Icon.Switch}
+        onAction={()=>{
+          query.updateLangType(query.langType == "To" ? "From" : "To")
+        }
+        } />
       <ActionPanel.Section title="Copy">
-        <Action.CopyToClipboard title="Copy Original" content={record.result.original} />
-        <Action.CopyToClipboard title="Copy Translation" content={record.result.text} />
+        <Action.CopyToClipboard title="Copy Translation" content={record.result.text ?? ""} shortcut= {{ modifiers: ["cmd", "ctrl"], key: "c" }}/>
+        <Action.CopyToClipboard title="Copy Original" content={record.result.original ?? ""} shortcut= {{ modifiers: ["cmd", "shift"], key: "c" }}/>
       </ActionPanel.Section>
+      { getLoadActionSection((str)=>{
+        query.updateText(str)
+      })}
       <Action title="Delete Translation" icon={Icon.Trash} shortcut= {{ modifiers: ["cmd"], key: "delete" }} onAction={()=>history.remove(record)} />
     </ActionPanel>
   )

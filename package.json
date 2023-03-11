@@ -114,7 +114,8 @@
         {
           "value": "az",
           "title": "Azərbaycan"
-        },        {
+        },
+        {
           "value": "be",
           "title": "Беларуская"
         },
@@ -289,14 +290,6 @@
       "type": "checkbox",
       "default": true,
       "required": false
-    },
-    {
-      "name": "isAutoTTS",
-      "label": "Enable text-to-speech for every translation",
-      "description": "Enable auto TTS everytime you get a generated translation",
-      "type": "checkbox",
-      "required": false,
-      "default": false
     },
     {
       "name": "maxHistorySize",

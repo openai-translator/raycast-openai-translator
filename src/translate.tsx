@@ -1,4 +1,4 @@
-import { List, Detail, ActionPanel, Action, getPreferenceValues, LaunchProps } from "@raycast/api";
+import { List, Detail, ActionPanel, Action, getPreferenceValues, LaunchProps, Icon } from "@raycast/api";
 import { useCallback, useEffect, useState } from "react";
 import { ContentView } from "./views/content";
 import { useQuery } from "./hooks/useQuery";
@@ -8,7 +8,6 @@ import { useHistory } from "./hooks/useHistory";
 
 export default function Command(props: LaunchProps) {
   const [selectedId, setSelectedId] = useState<string>('')
-
   const query = useQuery({ initialQuery: props.fallbackText, disableAutoLoad: false })
   const history = useHistory()
 
@@ -20,13 +19,27 @@ export default function Command(props: LaunchProps) {
       isLoading={query.isLoading}
       selectedItemId={ selectedId }
       onSearchTextChange={query.updateText}
-      searchBarAccessory={<LangDropdown selectedStandardLang={query.to} onLangChange={query.updateTo} />}
+      searchBarAccessory={
+        <LangDropdown
+          type={query.langType}
+          selectedStandardLang={ query.langType == "To" ? query.to : query.from }
+          onLangChange={ query.langType == "To" ? query.updateTo : query.updateFrom } />
+      }
       throttle={false}
       navigationTitle={"Translate"}
       actions={
-        query.text && (<ActionPanel>
-                         <Action title="Translate" onAction={()=>query.updateQuerying(true)} />
-                       </ActionPanel>)
+        <ActionPanel>
+          {query.text && (<Action
+                         title="Translate"
+                         icon={Icon.Book}
+                         onAction={() => query.updateQuerying(true)} />)}
+          <Action
+            title={`Switch to Translate ${query.langType == "To" ? "From" : "To"}`}
+            onAction={()=>{
+              query.updateLangType(query.langType == "To" ? "From" : "To")
+            }
+            } />
+        </ActionPanel>
       }
     >
       <ContentView
