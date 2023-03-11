@@ -1,4 +1,4 @@
-import { LocalStorage, showToast, Toast } from "@raycast/api";
+import { getPreferenceValues, LocalStorage, showToast, Toast } from "@raycast/api";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { TranslateResult } from "../providers/openai/translate";
 
@@ -19,6 +19,7 @@ export interface HistoryHook {
 }
 
 export function useHistory(): HistoryHook {
+  const { maxHistorySize } = getPreferenceValues<{maxHistorySize: string}>()
   const [data, setData] = useState<Record[]>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
 
@@ -40,9 +41,9 @@ export function useHistory(): HistoryHook {
   const add = useCallback(
     async (record: Record) => {
       // console.log(`add ${record.result.text}`)
-      const max = 10
-      const _data = data.length>max ? data.slice(data.length - max, data.length) : data
-      setData([..._data, record]);
+      const max = parseInt(maxHistorySize) || 30
+      const slice = data.length > max ? data.slice(data.length - max, data.length) : data
+      setData([...slice, record]);
     },
     [setData, data]
   );

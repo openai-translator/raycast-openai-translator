@@ -7,7 +7,6 @@ import { useHistory } from "./hooks/useHistory";
 
 
 export default function Command(props: LaunchProps) {
-  const [isLoading, setLoading] = useState<boolean>(false)
   const [selectedId, setSelectedId] = useState<string>('')
 
   const query = useQuery({ initialQuery: props.fallbackText, disableAutoLoad: false })
@@ -18,7 +17,7 @@ export default function Command(props: LaunchProps) {
       searchText={query.text}
       isShowingDetail={history.data.length > 0 || query.querying ? true : false }
       filtering={false}
-      isLoading={isLoading ? isLoading : query.isLoading}
+      isLoading={query.isLoading}
       selectedItemId={ selectedId }
       onSearchTextChange={query.updateText}
       searchBarAccessory={<LangDropdown selectedStandardLang={query.to} onLangChange={query.updateTo} />}
