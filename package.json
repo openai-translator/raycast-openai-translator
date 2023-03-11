@@ -29,10 +29,10 @@
     },
     {
       "name": "entrypoint",
-      "label": "OpenAI Entrypoint",
+      "label": "OpenAI API Entrypoint",
       "description": "Enter your custom OpenAI entrypoint",
       "type": "textfield",
-      "title": "OpenAI Entrypoint",
+      "title": "OpenAI API Entrypoint",
       "default": "https://api.openai.com/v1/chat/completions",
       "required": true
     },
@@ -114,8 +114,7 @@
         {
           "value": "az",
           "title": "Azərbaycan"
-        },
-        {
+        },        {
           "value": "be",
           "title": "Беларуская"
         },
@@ -269,7 +268,7 @@
     {
       "name": "isAutoLoadSelected",
       "label": "Enable auto-load selected text",
-      "description": "Load selected text from your frontmost application to the question bar automatically",
+      "description": "Load selected text from your frontmost application to the search bar automatically",
       "type": "checkbox",
       "title": "Auto-load Selected",
       "default": false,
@@ -278,10 +277,19 @@
     {
       "name": "isAutoLoadClipboard",
       "label": "Enable auto-load clipboard text",
-      "description": "Load selected text from your frontmost application to the question bar automatically",
+      "description": "Load selected text from your frontmost application to the search bar automatically",
       "type": "checkbox",
       "title": "Auto-load Clipboard",
       "default": false,
+      "required": false
+    },
+    {
+      "name": "isAutoStart",
+      "label": "Enable auto-start translation",
+      "description": "Auto start translation when the search bar is auto-fill from fallback command or selected or clipboard.",
+      "type": "checkbox",
+      "title": "Auto-start Translation",
+      "default": true,
       "required": false
     },
     {

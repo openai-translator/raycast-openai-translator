@@ -11,56 +11,72 @@ export interface QueryHook {
   updateQuerying: (arg: boolean) => Promise<void>
 }
 
-export function useQuery(props: { disableAutoLoad?: boolean }): QueryHook {
-  const { disableAutoLoad } = props;
-  const { toLang, isAutoLoadSelected, isAutoLoadClipboard} =
-    getPreferenceValues<{toLang: string, isAutoLoadSelected: boolean, isAutoLoadClipboard: boolean;}>()
-  const [text, setText] = useState<string>("");
+export function useQuery(props: { initialQuery?: string, disableAutoLoad?: boolean }): QueryHook {
+  const { initialQuery, disableAutoLoad } = props;
+  const { toLang, isAutoLoadSelected, isAutoLoadClipboard, isAutoStart} =
+    getPreferenceValues<{toLang: string, isAutoLoadSelected: boolean, isAutoLoadClipboard: boolean, isAutoStart: boolean;}>()
+  const [text, setText] = useState<string>(initialQuery || "");
   const [to, setTo] = useState<string>(toLang)
   const [isLoading, setLoading] = useState<boolean>(false);
   const [querying, setQuerying] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
-      if (isAutoLoadSelected && !disableAutoLoad) {
-        setLoading(true);
-        try {
-          const selectedText = await getSelectedText();
-          if (selectedText.length > 1) {
-            setText(selectedText.trim());
-            await showToast({
-              style: Toast.Style.Success,
-              title: "Selected text loaded!",
-            });
+      let tmp = ""
+      if(text.length == 0) {
+        if(!disableAutoLoad){
+          if (isAutoLoadSelected){
+            setLoading(true);
+            try {
+              const selectedText = (await getSelectedText()).trim();
+              if (selectedText.length > 1) {
+                tmp = selectedText
+                await showToast({
+                  style: Toast.Style.Success,
+                  title: "Selected text loaded!",
+                });
+              }
+            } catch (error) {
+              await showToast({
+                style: Toast.Style.Failure,
+                title: "Selected text couldn't load",
+                message: String(error),
+              });
+            }
+            setLoading(false);
           }
-        } catch (error) {
-          await showToast({
-            style: Toast.Style.Failure,
-            title: "Selected text couldn't load",
-            message: String(error),
-          });
-        }
-        setLoading(false);
-      } else if(isAutoLoadClipboard && !disableAutoLoad) {
-        setLoading(true);
-        try {
-          const { text } = await Clipboard.read();
-          if (text.length > 1) {
-            setText(text.trim());
-            await showToast({
-              style: Toast.Style.Success,
-              title: "Clipboard text loaded!",
-            });
+          if(isAutoLoadClipboard && tmp.length == 0) {
+            setLoading(true);
+            try {
+              const { text } = (await Clipboard.read());
+              if (text.trim().length > 1) {
+                tmp = text.trim()
+                await showToast({
+                  style: Toast.Style.Success,
+                  title: "Clipboard text loaded!",
+                });
+              }
+            } catch (error) {
+              await showToast({
+                style: Toast.Style.Failure,
+                title: "Clipboard text couldn't load",
+                message: String(error),
+              });
+            }
+            setLoading(false);
           }
-        } catch (error) {
-          await showToast({
-            style: Toast.Style.Failure,
-            title: "Clipboard text couldn't load",
-            message: String(error),
-          });
+          if(tmp.length > 0){
+            setText(tmp)
+          }
         }
-        setLoading(false);
+      } else {
+        tmp = text
       }
+
+      if(tmp.length > 0 && isAutoStart){
+        updateQuerying(true)
+      }
+
     })();
   }, []);
 

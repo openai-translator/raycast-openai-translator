@@ -1,6 +1,7 @@
 import { LocalStorage, showToast, Toast } from "@raycast/api";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { TranslateResult } from "../repo/translate";
+import { TranslateResult } from "../providers/openai/translate";
+
 
 
 export interface Record {
@@ -38,7 +39,10 @@ export function useHistory(): HistoryHook {
 
   const add = useCallback(
     async (record: Record) => {
-      setData([...data, record]);
+      // console.log(`add ${record.result.text}`)
+      const max = 10
+      const _data = data.length>max ? data.slice(data.length - max, data.length) : data
+      setData([..._data, record]);
     },
     [setData, data]
   );
