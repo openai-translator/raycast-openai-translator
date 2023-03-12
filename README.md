@@ -2,6 +2,12 @@
 
 [Raycast](https://www.raycast.com/) extension for translation based on ChatGPT API.
 
+
+
+https://user-images.githubusercontent.com/743074/224527077-8256a26a-bbeb-482e-86fa-74fe435e59fe.mov
+
+
+
 # Insipired By
 
 - [yetone/openai-translator](https://github.com/yetone/openai-translator)
@@ -41,7 +47,6 @@ Waitting  Raycast's review (raycast/extensions#))
 ![Commands](metadata/commands.png)
 ![Translate](metadata/translate.png)
 
-来做
 
 - What/What is it?(文本识别) (感谢 [yihong0618/iWhat](https://github.com/yihong0618/iWhat) 的 Prompts)
 
@@ -70,3 +75,16 @@ Waitting  Raycast's review (raycast/extensions#))
 ![Stream UI](metadata/stream-text.png)
 ![Lang Dropdown](metadata/lang-dropdown.png)
 ![Empty](metadata/empty.png)
+
+# 如何配置一键查询
+
+- 配置扩展
+  1. 配置全局快捷键
+  2. 确保打开自动带入高亮文字和自动开始查询
+
+![打开全局快捷键](https://user-images.githubusercontent.com/743074/224528361-6231ba8f-d8aa-45d7-9a36-cb3889452254.png)
+
+全键盘操作的效果：
+
+https://user-images.githubusercontent.com/743074/224528436-afca923d-b781-4754-86f5-e6b439b3e9e9.mov
+
