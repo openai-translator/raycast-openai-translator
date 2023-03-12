@@ -1,12 +1,13 @@
 import { getPreferenceValues, LocalStorage, showToast, Toast } from "@raycast/api";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { TranslateResult } from "../providers/openai/translate";
+import { TranslateMode, TranslateResult } from "../providers/openai/translate";
 
 
 
 export interface Record {
   id: string
-  created_at: string;
+  created_at: string
+  mode: TranslateMode
   result: TranslateResult
 }
 

@@ -3,5 +3,5 @@ import getBase from "./base";
 
 
 export default function Command(props: LaunchProps) {
-  return getBase(props, "translate")
+  return getBase(props, "what")
 }
