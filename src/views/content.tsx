@@ -60,7 +60,7 @@ export const ContentView = (props: ContentViewProps) => {
         from,
         to: query.to,
         original: query.text,
-        text: ref.current,
+        text: ref.current ?? "",
         error: message,
       },
     };
@@ -190,7 +190,7 @@ export const ContentView = (props: ContentViewProps) => {
   return data.length === 0 ? (
     <EmptyView />
   ) : (
-    <List.Section title="Results" subtitle={data.length.toLocaleString()}>
+    <List.Section title="History" subtitle={history.data.length.toLocaleString()}>
       {data.map((item, i) => {
         return "query" in item ? (
           <List.Item

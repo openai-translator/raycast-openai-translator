@@ -19,6 +19,7 @@ export default function getBase(props: LaunchProps, mode: TranslateMode = "trans
       filtering={false}
       isLoading={query.isLoading}
       selectedItemId={selectedId}
+      searchBarPlaceholder={`${capitalize(mode)}...`}
       onSearchTextChange={query.updateText}
       searchBarAccessory={
         <LangDropdown
@@ -28,7 +29,7 @@ export default function getBase(props: LaunchProps, mode: TranslateMode = "trans
         />
       }
       throttle={false}
-      navigationTitle={mode}
+      navigationTitle={capitalize(mode)}
       actions={
         <ActionPanel>
           {query.text && (

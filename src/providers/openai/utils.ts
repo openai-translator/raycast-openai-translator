@@ -22,8 +22,10 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
   });
   if (resp.body) {
     for await (const chunk of resp.body) {
-      const str = new TextDecoder().decode(chunk);
-      parser.feed(str);
+      if (chunk) {
+        const str = new TextDecoder().decode(chunk as ArrayBuffer);
+        parser.feed(str);
+      }
     }
   }
 }
