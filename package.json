@@ -3,10 +3,11 @@
   "name": "openai-translator",
   "title": "OpenAI Translator",
   "description": "Translation based on ChatGPT API.",
-  "icon": "command-icon.png",
+  "icon": "extension_icon.png",
   "author": "douo",
   "categories": [
-    "Applications"
+    "Applications",
+    "Productivity"
   ],
   "license": "MIT",
   "commands": [
@@ -332,8 +333,10 @@
     "xregexp": "^5.1.1"
   },
   "devDependencies": {
+    "@types/capitalize": "^2.0.0",
     "@types/node": "18.8.3",
     "@types/react": "18.0.9",
+    "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^7.32.0",

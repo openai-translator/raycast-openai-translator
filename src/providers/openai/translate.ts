@@ -16,10 +16,10 @@ export interface TranslateQuery {
 }
 
 export interface TranslateResult {
-  original?: string;
-  text?: string;
-  from?: string;
-  to?: string;
+  original: string;
+  text: string;
+  from: string;
+  to: string;
   error?: string;
 }
 
