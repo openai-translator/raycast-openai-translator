@@ -18,6 +18,20 @@
       "mode": "view"
     },
     {
+      "name": "polishing",
+      "title": "Polishing",
+      "subtitle": "Based on ChatGPT API",
+      "description": "Polishing based on ChatGPT API.",
+      "mode": "view"
+    },
+    {
+      "name": "summarize",
+      "title": "Summarize",
+      "subtitle": "Based on ChatGPT API",
+      "description": "Summarize based on ChatGPT API.",
+      "mode": "view"
+    },
+    {
       "name": "what",
       "title": "What",
       "subtitle": "What is it? Based on ChatGPT API",
