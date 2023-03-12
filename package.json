@@ -16,6 +16,13 @@
       "subtitle": "Based on ChatGPT API",
       "description": "Translation based on ChatGPT API.",
       "mode": "view"
+    },
+    {
+      "name": "what",
+      "title": "What",
+      "subtitle": "What is it? Based on ChatGPT API",
+      "description": "Identify some text and tell what is it?",
+      "mode": "view"
     }
   ],
   "preferences": [
@@ -302,6 +309,7 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.48.4",
+    "capitalize": "^2.0.4",
     "eventsource-parser": "^0.1.0",
     "guesslanguage-ng": "^0.0.2",
     "languagedetect": "^2.0.0",

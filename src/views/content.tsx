@@ -1,7 +1,7 @@
 import { Action, ActionPanel, clearSearchBar, getPreferenceValues, Icon, List, showToast, Toast } from "@raycast/api";
 import { DetailView } from "./detail"
 import { EmptyView } from "./empty";
-import { translate, TranslateQuery } from "../providers/openai/translate"
+import { translate, TranslateMode, TranslateQuery } from "../providers/openai/translate"
 import { QueryHook } from "../hooks/useQuery"
 import { useHistory, Record, HistoryHook } from "../hooks/useHistory";
 import { useEffect, useRef, useState } from "react";
@@ -12,6 +12,7 @@ import { getLoadActionSection } from "../actions/load";
 export interface ContentViewProps {
   query: QueryHook,
   history: HistoryHook,
+  mode: TranslateMode,
   setSelectedId: (value: string) => void
 }
 
@@ -24,7 +25,7 @@ export interface Querying {
 type ViewItem = Querying | Record
 
 export const ContentView = (props: ContentViewProps) => {
-  const { query, history, setSelectedId } = props
+  const { query, history, mode, setSelectedId } = props
 
   const [data, setData] = useState<ViewItem[]>([])
   const [querying, setQuerying] = useState<Querying | null>()
@@ -51,6 +52,7 @@ export const ContentView = (props: ContentViewProps) => {
     toast.style = Toast.Style.Failure;
     const record: Record = {
       id: uuidv4(),
+      mode,
       created_at: new Date().toISOString(),
       result: {
         from,
@@ -77,7 +79,7 @@ export const ContentView = (props: ContentViewProps) => {
     const _querying: Querying = {
       hook: query,
       query: {
-        mode: "translate",
+        mode,
         signal,
         text,
         detectFrom,
@@ -103,6 +105,7 @@ export const ContentView = (props: ContentViewProps) => {
               setTranslatedText(newText)
               const record: Record = {
                 id: uuidv4(),
+                mode,
                 created_at: new Date().toISOString(),
                 result: {
                   from: detectFrom,
@@ -193,6 +196,7 @@ export const ContentView = (props: ContentViewProps) => {
                    text={translatedText}
                    original={query.text}
                    from={querying? querying.query.detectFrom : "auto"}
+                   mode={querying? querying.query.mode : "translate"}
                    to={query.to}
                  />
                }
@@ -209,6 +213,7 @@ export const ContentView = (props: ContentViewProps) => {
                    original={item.result.original}
                    from={item.result.from}
                    to={item.result.to}
+                   mode={item.mode}
                    created_at={item.created_at}
                  />}
              />)
