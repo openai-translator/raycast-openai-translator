@@ -7,6 +7,7 @@ import { useHistory, Record, HistoryHook } from "../hooks/useHistory";
 import { useEffect, useRef, useState } from "react";
 import { detectLang } from "../providers/openai/lang";
 import { v4 as uuidv4 } from "uuid";
+import capitalize from "capitalize";
 import { getLoadActionSection } from "../actions/load";
 
 export interface ContentViewProps {
@@ -157,7 +158,7 @@ export const ContentView = (props: ContentViewProps) => {
     <ActionPanel>
       {
         query.text && (<Action
-                         title="Translate"
+                         title={capitalize(mode)}
                          icon={Icon.Book}
                          onAction={() => query.updateQuerying(true)} />)
       }

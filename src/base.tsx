@@ -5,7 +5,7 @@ import { useQuery } from "./hooks/useQuery";
 import { LangDropdown } from "./views/lang-dropdown"
 import { useHistory } from "./hooks/useHistory";
 import { TranslateMode } from "./providers/openai/translate";
-
+import capitalize from "capitalize";
 
 export default function getBase(props: LaunchProps, mode:TranslateMode = "translate") {
   const [selectedId, setSelectedId] = useState<string>('')
@@ -32,7 +32,7 @@ export default function getBase(props: LaunchProps, mode:TranslateMode = "transl
       actions={
         <ActionPanel>
           {query.text && (<Action
-                            title={ mode }
+                            title={ capitalize(mode) }
                             icon={Icon.Book}
                             onAction={() => query.updateQuerying(true)} />)}
           <Action
