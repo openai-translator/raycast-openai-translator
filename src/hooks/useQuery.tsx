@@ -2,41 +2,45 @@ import { getPreferenceValues, getSelectedText, showToast, Toast, Clipboard } fro
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export interface QueryHook {
-  text: string
-  to: string
-  from: string
-  querying: boolean
-  isLoading: boolean
-  updateText: (arg: string) => Promise<void>
-  updateTo: (arg: string) => Promise<void>
-  updateFrom: (arg: string) => Promise<void>
-  updateQuerying: (arg: boolean) => Promise<void>
-  langType: string
-  updateLangType: (arg: string) => Promise<void>
+  text: string;
+  to: string;
+  from: string;
+  querying: boolean;
+  isLoading: boolean;
+  updateText: (arg: string) => Promise<void>;
+  updateTo: (arg: string) => Promise<void>;
+  updateFrom: (arg: string) => Promise<void>;
+  updateQuerying: (arg: boolean) => Promise<void>;
+  langType: string;
+  updateLangType: (arg: string) => Promise<void>;
 }
 
-export function useQuery(props: { initialQuery?: string, disableAutoLoad?: boolean }): QueryHook {
+export function useQuery(props: { initialQuery?: string; disableAutoLoad?: boolean }): QueryHook {
   const { initialQuery, disableAutoLoad } = props;
-  const { toLang, isAutoLoadSelected, isAutoLoadClipboard, isAutoStart} =
-    getPreferenceValues<{toLang: string, isAutoLoadSelected: boolean, isAutoLoadClipboard: boolean, isAutoStart: boolean;}>()
+  const { toLang, isAutoLoadSelected, isAutoLoadClipboard, isAutoStart } = getPreferenceValues<{
+    toLang: string;
+    isAutoLoadSelected: boolean;
+    isAutoLoadClipboard: boolean;
+    isAutoStart: boolean;
+  }>();
   const [text, setText] = useState<string>(initialQuery || "");
-  const [to, setTo] = useState<string>(toLang)
-  const [from, setFrom] = useState<string>("auto")
-  const [langType, setLangType] = useState("To")
+  const [to, setTo] = useState<string>(toLang);
+  const [from, setFrom] = useState<string>("auto");
+  const [langType, setLangType] = useState("To");
   const [isLoading, setLoading] = useState<boolean>(false);
   const [querying, setQuerying] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
-      let tmp = ""
-      if(text.length == 0) {
-        if(!disableAutoLoad){
-          if (isAutoLoadSelected){
+      let tmp = "";
+      if (text.length == 0) {
+        if (!disableAutoLoad) {
+          if (isAutoLoadSelected) {
             setLoading(true);
             try {
               const selectedText = (await getSelectedText()).trim();
               if (selectedText.length > 1) {
-                tmp = selectedText
+                tmp = selectedText;
                 await showToast({
                   style: Toast.Style.Success,
                   title: "Selected text loaded!",
@@ -51,12 +55,12 @@ export function useQuery(props: { initialQuery?: string, disableAutoLoad?: boole
             }
             setLoading(false);
           }
-          if(isAutoLoadClipboard && tmp.length == 0) {
+          if (isAutoLoadClipboard && tmp.length == 0) {
             setLoading(true);
             try {
-              const { text } = (await Clipboard.read());
+              const { text } = await Clipboard.read();
               if (text.trim().length > 1) {
-                tmp = text.trim()
+                tmp = text.trim();
                 await showToast({
                   style: Toast.Style.Success,
                   title: "Clipboard text loaded!",
@@ -71,18 +75,17 @@ export function useQuery(props: { initialQuery?: string, disableAutoLoad?: boole
             }
             setLoading(false);
           }
-          if(tmp.length > 0){
-            setText(tmp)
+          if (tmp.length > 0) {
+            setText(tmp);
           }
         }
       } else {
-        tmp = text
+        tmp = text;
       }
 
-      if(tmp.length > 0 && isAutoStart){
-        updateQuerying(true)
+      if (tmp.length > 0 && isAutoStart) {
+        updateQuerying(true);
       }
-
     })();
   }, []);
 
@@ -121,8 +124,20 @@ export function useQuery(props: { initialQuery?: string, disableAutoLoad?: boole
     [setLangType, langType]
   );
 
-  return useMemo(() => (
-    { text, to, from, querying, isLoading, updateText, updateTo, updateFrom, updateQuerying, langType, updateLangType }
-  ),
-    [text, to, from, querying, isLoading, updateText, updateTo, updateFrom, updateQuerying, langType, updateLangType]);
+  return useMemo(
+    () => ({
+      text,
+      to,
+      from,
+      querying,
+      isLoading,
+      updateText,
+      updateTo,
+      updateFrom,
+      updateQuerying,
+      langType,
+      updateLangType,
+    }),
+    [text, to, from, querying, isLoading, updateText, updateTo, updateFrom, updateQuerying, langType, updateLangType]
+  );
 }
