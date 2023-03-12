@@ -1,6 +1,6 @@
 # OpenAI Translator
 
-[Raycast](https://www.raycast.com/) 基于 ChatGPT API 的 Raycast 翻译扩展。
+[Raycast](https://www.raycast.com/) extension for translation based on ChatGPT API.
 
 
 
@@ -13,14 +13,14 @@ https://user-images.githubusercontent.com/743074/224527077-8256a26a-bbeb-482e-86
 - [yetone/openai-translator](https://github.com/yetone/openai-translator)
 - [yihong0618/iWhat](https://github.com/yihong0618/iWhat)
 
-# 参考(Cpoy)
+# Learn(Cpoy) a lot from
 
 - [yetone/openai-translator](https://github.com/yetone/openai-translator) (MIT License)
 - [abielzulio/chatgpt-raycast](https://github.com/abielzulio/chatgpt-raycast) (MIT License)
 
-# 安装
+# Install
 
-## 手动
+## Manual
 
 ``` shell
 git clone https://github.com/douo/raycast-openai-translator.git
@@ -30,11 +30,11 @@ npm install && npm run dev
 
 After the extension command show up, You can stop(`Ctrl-c`) the server safely.
 
-## 商店
+## Store
 
-等待审核。。。
+Waitting  Raycast's review (raycast/extensions#))
 
-# 功能
+# Feature
 
 ![Intro](metadata/configuration.png)
 
