@@ -1,6 +1,6 @@
 # OpenAI Translator
 
-Raycast extension for translation based on ChatGPT API.
+[Raycast](https://www.raycast.com/) extension for translation based on ChatGPT API.
 
 # Insipired By
 
@@ -14,7 +14,7 @@ Raycast extension for translation based on ChatGPT API.
 
 # Install
 
-## Mananual
+## Manual
 
 ``` shell
 git clone https://github.com/douo/raycast-openai-translator.git
@@ -32,7 +32,7 @@ Waitting  Raycast's review (raycast/extensions#))
 
 ![Intro](metadata/configuration.png)
 
-来自 [yetone/openai-translator] (https://github.com/yetone/openai-translator)：
+感谢 [yetone/openai-translator](https://github.com/yetone/openai-translator)：
 
 - 翻译
 - 润色
@@ -41,13 +41,13 @@ Waitting  Raycast's review (raycast/extensions#))
 ![Commands](metadata/commands.png)
 ![Translate](metadata/translate.png)
 
-来做 [yihong0618/iWhat](https://github.com/yihong0618/iWhat)
+来做
 
-- What/What is it?(文本识别)
+- What/What is it?(文本识别) (感谢 [yihong0618/iWhat](https://github.com/yihong0618/iWhat) 的 Prompts)
 
 ![What](metadata/what-zh.png)
 
-来做 Raycast
+来自 Raycast
 
 - 自动导入当前选择文本
 - 自动导入剪切板文本
