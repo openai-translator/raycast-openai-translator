@@ -34,6 +34,8 @@ npm install && npm run dev
 
 ![Intro](doc/configuration.png)
 
+获取你的 [OpenAI](https://platform.openai.com/account/api-keys) API Key.
+
 感谢 [yetone/openai-translator](https://github.com/yetone/openai-translator)：
 
 - 翻译
@@ -72,13 +74,14 @@ npm install && npm run dev
 ![Lang Dropdown](doc/lang-dropdown.png)
 ![Empty](doc/empty.png)
 
-# 如何配置一键查询
+# 如何配置划词搜索
 
-- 配置扩展
-  1. 配置全局快捷键
-  2. 确保打开自动带入高亮文字和自动开始查询
+- 进入扩展配置（`⌘+⇧+,`）
+  1. 选择 "Query Seleceted"
+  2. 如下图所示配置快捷键
+  3. 确保 "Query Mode" 为 "Translate"
 
-![打开全局快捷键](https://user-images.githubusercontent.com/743074/224528361-6231ba8f-d8aa-45d7-9a36-cb3889452254.png)
+![打开全局快捷键](doc/query-selected.png)
 
 全键盘操作的效果：
 
