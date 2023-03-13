@@ -34,6 +34,8 @@ Waitting  Raycast's review : https://github.com/raycast/extensions/pull/5306
 
 ![Intro](doc/configuration.png)
 
+Get your [OpenAI](https://platform.openai.com/account/api-keys) API Keys
+
 Thanks to [yetone/openai-translator](https://github.com/yetone/openai-translator)：
 
 - Translate
@@ -73,12 +75,12 @@ Others:
 
 # How to configure one-click query
 
-- Configure the extension
-  1. Configure global shortcuts
-  2. Ensure that automatic import of highlighted text and automatic start of query are enabled
+- Configure the extension(`⌘+⇧+,`).
+  1. Select "Query Selected"
+  2. Setup shortcut
+  3. Make sure "Query Mode" is "Translate".
 
-![Enable Global Shortcuts](https://user-images.githubusercontent.com/743074/224528361-6231ba8f-d8aa-45d7-9a36-cb3889452254.png)
+![Enable Global Shortcuts](doc/query-selected.png)
 
-The example of pure keyboard operation:
 
 https://user-images.githubusercontent.com/743074/224528436-afca923d-b781-4754-86f5-e6b439b3e9e9.mov
