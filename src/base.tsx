@@ -9,7 +9,7 @@ import capitalize from "capitalize";
 
 export default function getBase(
   props: LaunchProps,
-  mode = "translate",
+  mode: TranslateMode = "translate",
   forceEnableAutoStart = false,
   forceEnableAutoLoadSelected = false,
   forceEnableAutoLoadClipboard = false
