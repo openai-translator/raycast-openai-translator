@@ -34,7 +34,7 @@
     },
     {
       "name": "what",
-      "title": "What is it?",
+      "title": "What Is It?",
       "subtitle": "Identifier based on ChatGPT API",
       "description": "Identify some text and tell what is it?",
       "mode": "view"
