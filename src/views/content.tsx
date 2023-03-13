@@ -130,7 +130,7 @@ export const ContentView = (props: ContentViewProps) => {
     };
     setTranslatedText("");
     setQuerying(_querying);
-    query.updateText("")
+    query.updateText("");
     translate(_querying.query, entrypoint, apikey);
   }
 
