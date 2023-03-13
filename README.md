@@ -1,12 +1,8 @@
 # OpenAI Translator
 
-[Raycast](https://www.raycast.com/) 基于 ChatGPT API 的 Raycast 翻译扩展。
-
-
+基于 ChatGPT API 的 [Raycast](https://www.raycast.com/) 翻译扩展。
 
 https://user-images.githubusercontent.com/743074/224527077-8256a26a-bbeb-482e-86fa-74fe435e59fe.mov
-
-
 
 # Insipired By
 
@@ -28,15 +24,15 @@ cd raycast-openai-translator
 npm install && npm run dev
 ```
 
-After the extension command show up, You can stop(`Ctrl-c`) the server safely.
+扩展成功显示后就可以 `Ctrl-c` 结束 npm 进程，扩展能继续使用。
 
 ## 商店
 
-等待 Raycast 审核...
+等待 Raycast 审核: https://github.com/raycast/extensions/pull/5306
 
 # 功能
 
-![Intro](metadata/configuration.png)
+![Intro](doc/configuration.png)
 
 感谢 [yetone/openai-translator](https://github.com/yetone/openai-translator)：
 
@@ -44,13 +40,13 @@ After the extension command show up, You can stop(`Ctrl-c`) the server safely.
 - 润色
 - 总结
 
-![Commands](metadata/commands.png)
-![Translate](metadata/translate.png)
+![Commands](doc/commands.png)
+![Translate](doc/translate.png)
 
 
 - What/What is it?(文本识别) (感谢 [yihong0618/iWhat](https://github.com/yihong0618/iWhat) 的 Prompts)
 
-![What](metadata/what-zh.png)
+![What](doc/what-zh.png)
 
 来自 Raycast
 
@@ -58,7 +54,7 @@ After the extension command show up, You can stop(`Ctrl-c`) the server safely.
 - 自动导入剪切板文本
 - 可绑定全局快捷键
 
-![Actions](metadata/actions.png)
+![Actions](doc/actions.png)
 
 
 其他
@@ -72,9 +68,9 @@ After the extension command show up, You can stop(`Ctrl-c`) the server safely.
 - [ ] i18n
 - [ ] TTS
 
-![Stream UI](metadata/stream-text.png)
-![Lang Dropdown](metadata/lang-dropdown.png)
-![Empty](metadata/empty.png)
+![Stream UI](doc/stream-text.png)
+![Lang Dropdown](doc/lang-dropdown.png)
+![Empty](doc/empty.png)
 
 # 如何配置一键查询
 
