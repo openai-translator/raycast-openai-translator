@@ -112,7 +112,7 @@
     {
       "name": "apikey",
       "label": "OpenAI API Key",
-      "description": "Enter your personal OpenAI API Key",
+      "description": "Enter your personal OpenAI API Key,  Type 'none' if your entrypoint do not require an API key.",
       "type": "password",
       "title": "OpenAI API Key",
       "required": true
@@ -120,7 +120,7 @@
     {
       "name": "entrypoint",
       "label": "OpenAI API Entrypoint",
-      "description": "Enter your custom OpenAI entrypoint",
+      "description": "Enter your custom OpenAI entrypoint.",
       "type": "textfield",
       "title": "OpenAI API Entrypoint",
       "default": "https://api.openai.com/v1/chat/completions",
