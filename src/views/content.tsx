@@ -176,9 +176,10 @@ export const ContentView = (props: ContentViewProps) => {
           shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
         />
       </ActionPanel.Section>
-      {getLoadActionSection((str) => {
+      {getLoadActionSection(record, (str) => {
         query.updateText(str);
       })}
+
       <Action
         title="Delete Translation"
         icon={Icon.Trash}
