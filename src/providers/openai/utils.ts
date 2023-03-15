@@ -29,7 +29,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         }
       }
     }
-  }catch(error) {
-    onError({error})
+  } catch (error) {
+    onError({ error });
   }
 }
