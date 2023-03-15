@@ -17,6 +17,7 @@ export const getModeActionSection = (callback: (arg0: TranslateMode) => void) =>
       <Action
         title={capitalize(m[0])}
         icon={m[1]}
+        key={m[0]}
         onAction={() => {
           callback(m[0]);
         }}
