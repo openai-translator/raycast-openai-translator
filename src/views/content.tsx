@@ -156,7 +156,7 @@ export const ContentView = (props: ContentViewProps) => {
 
   const getQueryingActionPanel = () => (
     <ActionPanel>
-      <ActionPanel.Submenu title="Abort">
+      <ActionPanel.Submenu title="Cancel">
         <Action
           title="Abort"
           icon={Icon.Stop}
