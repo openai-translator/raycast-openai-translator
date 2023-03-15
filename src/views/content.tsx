@@ -1,4 +1,4 @@
-import { Action, ActionPanel, clearSearchBar, getPreferenceValues, Icon, List, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Alert, clearSearchBar, getPreferenceValues, Icon, List, showToast, Toast } from "@raycast/api";
 import { DetailView } from "./detail";
 import { EmptyView } from "./empty";
 import { translate, TranslateMode, TranslateQuery } from "../providers/openai/translate";
@@ -21,6 +21,7 @@ export interface Querying {
   hook: QueryHook;
   query: TranslateQuery;
   id: string;
+  controller: AbortController;
 }
 
 type ViewItem = Querying | Record;
@@ -80,6 +81,7 @@ export const ContentView = (props: ContentViewProps) => {
     const detectTo = query.to;
     const _querying: Querying = {
       hook: query,
+      controller,
       query: {
         mode,
         signal,
@@ -152,7 +154,21 @@ export const ContentView = (props: ContentViewProps) => {
     ref.current = translatedText;
   }, [translatedText]);
 
-  const getQueryingActionPanel = () => <ActionPanel></ActionPanel>;
+  const getQueryingActionPanel = () => (
+    <ActionPanel>
+      <ActionPanel.Submenu title="Abort">
+        <Action
+          title="Abort"
+          icon={Icon.Stop}
+          shortcut={{ modifiers: ["ctrl"], key: "c" }}
+          onAction={() => {
+            if(querying){
+              querying.controller.abort()
+            }
+          }}
+        />
+      </ActionPanel.Submenu>
+    </ActionPanel>);
 
   const getRecordActionPanel = (record: Record) => (
     <ActionPanel>
