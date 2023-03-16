@@ -106,6 +106,40 @@
           ]
         }
       ]
+    },
+    {
+      "name": "ocr",
+      "title": "Query OCR",
+      "description": "Query selected text from frontmost application",
+      "mode": "no-view",
+      "preferences": [
+        {
+          "name": "mode",
+          "type": "dropdown",
+          "required": false,
+          "title": "Query Mode",
+          "default": "translate",
+          "description": "Choice a mode to query using this command",
+          "data": [
+            {
+              "value": "translate",
+              "title": "Translate"
+            },
+            {
+              "value": "polishing",
+              "title": "Polishing"
+            },
+            {
+              "value": "summarize",
+              "title": "Summarize"
+            },
+            {
+              "value": "what",
+              "title": "What"
+            }
+          ]
+        }
+      ]
     }
   ],
   "preferences": [
