@@ -1,10 +1,14 @@
 import sys
 import cv2
+import json
 import Quartz
 import Vision
+import subprocess
+import urllib.parse
 from Cocoa import NSURL, NSRange
 from Foundation import NSDictionary, NSArray
 from pathlib import Path
+
 
 
 def ocr(img_path: Path, lang="zh_Hans"):
@@ -44,8 +48,9 @@ def ocr(img_path: Path, lang="zh_Hans"):
     return results
 
 
-def locating(img_path: Path, results):
-    img = cv2.imread(str(img_path))
+def locating(img_path: Path, results) -> str:
+    path = str(img_path)
+    img = cv2.imread(path)
     h = img.shape[0]
     w = img.shape[1]
     for _, _, box in results:
@@ -56,21 +61,31 @@ def locating(img_path: Path, results):
         )
         img = cv2.rectangle(img, sp, ep, (255, 0, 0), 2)
 
-    target = str(img_path.with_stem(img_path.name + "_loc"))
-    print(target)
-    cv2.imwrite(target, img)
+    cv2.imwrite(path, img)
+    return path
 
-def text(results):
+def text(results) -> str:
     return "\n".join(r[0] for r in results)
 
 def main():
+    mode = sys.argv[2]
     img_path = Path(sys.argv[1]).resolve()
     if not img_path.is_file():
         sys.exit("Invalid image path")
     results = ocr(img_path)
-    locating(img_path, results)
-    print(text(results))
-
+    if len(results) == 0:
+        sys.exit("No Text Found")
+    img = locating(img_path, results)
+    context = {
+        "txt" : text(results),
+        "mode" : mode,
+        "img" : img
+    }
+    subprocess.call(
+    ["/usr/bin/open",
+     f"raycast://extensions/douo/openai-translator/translate?context={urllib.parse.quote(json.dumps(context))}"
+     ]
+    )
 
 if __name__ == "__main__":
     main()
