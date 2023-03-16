@@ -16,8 +16,18 @@ function screencapture(file: string){
   return status
 }
 
-function setupEnv(python: string){
-
+function setupEnv(){
+  console.log("setup")
+  const shell  = `${environment.assetsPath}/setup.sh`;
+  const { status, stdout, stderr } = spawnSync(
+    '/usr/bin/osascript',
+    ['-e', `tell application "Terminal" to do script "/bin/sh ${shell}"`,
+      '-e', 'tell application "Terminal" to activate'
+    ],
+    { stdio: 'ignore' });
+  if(status != 0){
+    showHUD(`Setup Failed!`);
+  }
 }
 
 
@@ -25,19 +35,26 @@ export default async function Command() {
   const { mode } = getPreferenceValues<{ mode: TranslateMode }>();
   const ocrPath = `${environment.assetsPath}/ocr`;
   const python = `${environment.assetsPath}/venv/bin/python`;
-  const tmpFile = `${ocrPath}/${Date.now()}.png`;
-  fs.mkdirSync(ocrPath, { recursive: true });
-  screencapture(tmpFile)
-  if(fs.existsSync(tmpFile)){
-    // showHUD("Processing...")
-    const { status, stdout, stderr } = spawnSync(
-      python,
-      [`${environment.assetsPath}/vision.py`, tmpFile, mode],
-      { stdio: 'ignore' });
-    if(status != 0){
-      showHUD(`Failed:${stderr ? stderr.toString(): "none"}`);
-    }
+
+  const vision = `${environment.assetsPath}/vision.py`;
+  console.log(python)
+  if(!fs.existsSync(python)){
+    setupEnv()
   }else{
-    showHUD("Cancel");
+    const tmpFile = `${ocrPath}/${Date.now()}.png`;
+    screencapture(tmpFile)
+    if(fs.existsSync(tmpFile)){
+      showHUD("Processing...")
+      const { status, stdout, stderr } = spawnSync(
+        python,
+        [`${environment.assetsPath}/vision.py`, tmpFile, mode],
+        { stdio: 'ignore' });
+      if(status != 0){
+        showHUD(`Failed:${stderr ? stderr.toString(): "none"}`);
+      }
+    }else{
+      showHUD("Cancel");
+    }
   }
+
 }
