@@ -1,5 +1,4 @@
-import { Action, ActionPanel, Clipboard, getSelectedText, Icon, showToast, Toast } from "@raycast/api";
-import { QueryHook } from "../hooks/useQuery";
+import { Action, ActionPanel, getSelectedText, Icon, showToast, Toast } from "@raycast/api";
 import { Record } from "../hooks/useHistory";
 
 export const getLoadActionSection = (record: Record, callback: (arg0: string) => void) => (
@@ -9,8 +8,8 @@ export const getLoadActionSection = (record: Record, callback: (arg0: string) =>
       shortcut={{ modifiers: ["cmd"], key: "l" }}
       icon={Icon.Repeat}
       onAction={() => {
-        if(record.result.original){
-          callback(record.result.original)
+        if (record.result.original) {
+          callback(record.result.original);
         }
       }}
     />
@@ -19,8 +18,8 @@ export const getLoadActionSection = (record: Record, callback: (arg0: string) =>
       shortcut={{ modifiers: ["cmd", "shift"], key: "l" }}
       icon={Icon.Repeat}
       onAction={() => {
-        if(record.result.text){
-          callback(record.result.text)
+        if (record.result.text) {
+          callback(record.result.text);
         }
       }}
     />
