@@ -224,12 +224,14 @@ export const ContentView = (props: ContentViewProps) => {
           title="Clear History"
           icon={Icon.DeleteDocument}
           style={Action.Style.Destructive}
-          onAction={ async () => {
-            if (await confirmAlert({
-              title: "Clear History?",
-              message: `${history.data.length} items will be removed.`
-            })) {
-              history.clear()
+          onAction={async () => {
+            if (
+              await confirmAlert({
+                title: "Clear History?",
+                message: `${history.data.length} items will be removed.`,
+              })
+            ) {
+              history.clear();
             }
           }}
         />
