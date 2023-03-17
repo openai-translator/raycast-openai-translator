@@ -1,5 +1,5 @@
 import { getPreferenceValues, LocalStorage, showToast, Toast } from "@raycast/api";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TranslateMode, TranslateResult } from "../providers/openai/translate";
 import { promises as fs } from "fs";
 
@@ -22,28 +22,32 @@ export interface HistoryHook {
 export function useHistory(): HistoryHook {
   const { maxHistorySize } = getPreferenceValues<{ maxHistorySize: string }>();
   const [data, setData] = useState<Record[]>([]);
+  const countRef = useRef(data);
   const [isLoading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     (async () => {
       const storedHistory = await LocalStorage.getItem<string>("history");
-
       if (storedHistory) {
-        setData((previous) => [...previous, ...JSON.parse(storedHistory)]);
+        setData(JSON.parse(storedHistory));
         setLoading(false);
       }
     })();
   }, []);
 
   useEffect(() => {
-    LocalStorage.setItem("history", JSON.stringify(data));
+    if (countRef.current != data) {
+      countRef.current = data;
+      LocalStorage.setItem("history", JSON.stringify(data));
+    }
   }, [data]);
 
   const add = useCallback(
     async (record: Record) => {
+      const data = countRef.current;
       const max = parseInt(maxHistorySize) || 30;
       const slice = data.length > max ? data.slice(data.length - max, data.length) : data;
-      const remove = data.slice(0, data.length - max);
+      const remove = data.length > max ? data.slice(0, data.length - max) : [];
       for (const r of remove) {
         if (r.ocrImg) {
           await fs.unlink(r.ocrImg);
@@ -56,6 +60,7 @@ export function useHistory(): HistoryHook {
 
   const remove = useCallback(
     async (record: Record) => {
+      const data = countRef.current;
       const toast = await showToast({
         title: "Removing record...",
         style: Toast.Style.Animated,
@@ -72,6 +77,7 @@ export function useHistory(): HistoryHook {
   );
 
   const clear = useCallback(async () => {
+    const data = countRef.current;
     const toast = await showToast({
       title: "Clearing history...",
       style: Toast.Style.Animated,

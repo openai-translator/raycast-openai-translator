@@ -235,7 +235,7 @@ export const ContentView = (props: ContentViewProps) => {
             id={item.id}
             key={item.id}
             title={item.query.text}
-            accessories={[{ text: `#${i}` }]}
+            accessories={[{ text: `#${i + 1}` }]}
             actions={getQueryingActionPanel()}
             detail={
               <DetailView
