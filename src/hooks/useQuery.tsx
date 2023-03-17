@@ -13,6 +13,8 @@ export interface QueryHook {
   updateQuerying: (arg: boolean) => Promise<void>;
   langType: string;
   updateLangType: (arg: string) => Promise<void>;
+  ocrImage: string | undefined;
+  updateOcr: (arg: string | undefined) => Promise<void>;
 }
 
 export interface UseQueryProps {
@@ -20,10 +22,11 @@ export interface UseQueryProps {
   forceEnableAutoStart: boolean;
   forceEnableAutoLoadSelected: boolean;
   forceEnableAutoLoadClipboard: boolean;
+  ocrImage: string | undefined;
 }
 
 export function useQuery(props: UseQueryProps): QueryHook {
-  const { initialQuery, forceEnableAutoStart, forceEnableAutoLoadSelected, forceEnableAutoLoadClipboard } = props;
+  const { initialQuery, forceEnableAutoStart, forceEnableAutoLoadSelected, forceEnableAutoLoadClipboard, ocrImage: initialOcr } = props;
   const { toLang, isAutoLoadSelected, isAutoLoadClipboard, isAutoStart } = getPreferenceValues<{
     toLang: string;
     isAutoLoadSelected: boolean;
@@ -36,6 +39,7 @@ export function useQuery(props: UseQueryProps): QueryHook {
   const [langType, setLangType] = useState("To");
   const [isLoading, setLoading] = useState<boolean>(false);
   const [querying, setQuerying] = useState<boolean>(false);
+  const [ocrImage, setOcrImage] = useState<string|undefined>(initialOcr);
 
   useEffect(() => {
     (async () => {
@@ -117,6 +121,9 @@ export function useQuery(props: UseQueryProps): QueryHook {
 
   const updateQuerying = useCallback(
     async (value: boolean) => {
+      if(!value && querying){
+        setOcrImage(undefined)
+      }
       setQuerying(value);
     },
     [setQuerying, querying]
@@ -128,6 +135,14 @@ export function useQuery(props: UseQueryProps): QueryHook {
     },
     [setLangType, langType]
   );
+
+  const updateOcr = useCallback(
+    async (value: string | undefined) => {
+      setOcrImage(value);
+    },
+    [setOcrImage, ocrImage]
+  );
+
 
   return useMemo(
     () => ({
@@ -142,7 +157,9 @@ export function useQuery(props: UseQueryProps): QueryHook {
       updateQuerying,
       langType,
       updateLangType,
+      ocrImage,
+      updateOcr
     }),
-    [text, to, from, querying, isLoading, updateText, updateTo, updateFrom, updateQuerying, langType, updateLangType]
+    [text, to, from, querying, isLoading, updateText, updateTo, updateFrom, updateQuerying, langType, updateLangType, ocrImage, updateOcr]
   );
 }

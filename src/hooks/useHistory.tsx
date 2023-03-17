@@ -64,7 +64,7 @@ export function useHistory(): HistoryHook {
       });
       const newHistory: Record[] = data.filter((item) => item.id !== record.id);
       if(record.ocrImg) {
-          await fs.unlink(record.ocrImg)
+        await fs.unlink(record.ocrImg)
       }
       setData(newHistory);
       toast.title = "Record removed!";

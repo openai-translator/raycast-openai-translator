@@ -35,16 +35,17 @@ export default async function Command() {
   const { mode } = getPreferenceValues<{ mode: TranslateMode }>();
   const ocrPath = `${environment.assetsPath}/ocr`;
   const python = `${environment.assetsPath}/venv/bin/python`;
-
   const vision = `${environment.assetsPath}/vision.py`;
-  console.log(python)
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
   if(!fs.existsSync(python)){
     setupEnv()
   }else{
     const tmpFile = `${ocrPath}/${Date.now()}.png`;
+    await fs.promises.mkdir(ocrPath,  { recursive: true })
     screencapture(tmpFile)
     if(fs.existsSync(tmpFile)){
       showHUD("Processing...")
+      await delay(1)
       const { status, stdout, stderr } = spawnSync(
         python,
         [`${environment.assetsPath}/vision.py`, tmpFile, mode],
