@@ -27,6 +27,7 @@ export interface ContentViewProps {
   mode: TranslateMode;
   setMode: (value: TranslateMode) => void;
   setSelectedId: (value: string) => void;
+  initImg: string | undefined;
 }
 
 export interface Querying {
@@ -40,6 +41,7 @@ type ViewItem = Querying | Record;
 
 export const ContentView = (props: ContentViewProps) => {
   const { query, history, mode, setMode, setSelectedId } = props;
+  let { initImg } = props
 
   const [data, setData] = useState<ViewItem[]>([]);
   const [querying, setQuerying] = useState<Querying | null>();
@@ -62,7 +64,7 @@ export const ContentView = (props: ContentViewProps) => {
     }
   }
 
-  function onTranslationError(toast: Toast, from: string, title: string, message: string) {
+  function onTranslationError(toast: Toast, from: string, title: string, message: string, img: string) {
     (toast.title = title), (toast.message = message);
     toast.style = Toast.Style.Failure;
     const record: Record = {
@@ -76,6 +78,7 @@ export const ContentView = (props: ContentViewProps) => {
         text: ref.current ?? "",
         error: message,
       },
+      ocrImg: img
     };
     history.add(record);
     query.updateQuerying(false);
@@ -91,6 +94,9 @@ export const ContentView = (props: ContentViewProps) => {
     });
     const text = query.text;
     const detectTo = query.to;
+    const img = initImg
+    initImg = undefined
+    console.log("querying")
     const _querying: Querying = {
       hook: query,
       controller,
@@ -109,6 +115,7 @@ export const ContentView = (props: ContentViewProps) => {
           });
         },
         onFinish: (reason) => {
+          console.log(1,reason, initImg, ref.current)
           toast.title = "Got your translation!";
           toast.style = Toast.Style.Success;
           if (reason !== "stop") {
@@ -120,6 +127,7 @@ export const ContentView = (props: ContentViewProps) => {
                   ? ref.current.slice(0, -1)
                   : ref.current;
               setTranslatedText(newText);
+
               const record: Record = {
                 id: uuidv4(),
                 mode,
@@ -130,10 +138,12 @@ export const ContentView = (props: ContentViewProps) => {
                   original: text,
                   text: newText,
                 },
+                ocrImg: img,
               };
               history.add(record);
             }
             query.updateQuerying(false);
+
           }
         },
         onError: (error) => {
@@ -238,6 +248,7 @@ export const ContentView = (props: ContentViewProps) => {
                 original={querying ? querying.query.text : ""}
                 from={querying ? querying.query.detectFrom : "auto"}
                 mode={querying ? querying.query.mode : "translate"}
+                ocrImg={initImg}
                 to={query.to}
               />
             }
@@ -257,6 +268,7 @@ export const ContentView = (props: ContentViewProps) => {
                 to={item.result.to}
                 mode={item.mode}
                 created_at={item.created_at}
+                ocrImg={item.ocrImg}
               />
             }
           />

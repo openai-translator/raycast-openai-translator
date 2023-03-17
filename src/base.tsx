@@ -14,10 +14,21 @@ export default function getBase(
   forceEnableAutoLoadSelected = false,
   forceEnableAutoLoadClipboard = false
 ) {
+  let initialQuery: string | undefined = ""
+  let ocrImg: string | undefined
+  if(props.launchContext){
+    initialMode = (props.launchContext['mode'] as TranslateMode);
+    initialQuery = props.launchContext['txt'];
+    ocrImg = props.launchContext['img']
+    forceEnableAutoStart = true;
+  }else{
+    initialQuery = props.fallbackText
+  }
+
   const [mode, setMode] = useState<TranslateMode>(initialMode);
   const [selectedId, setSelectedId] = useState<string>("");
   const query = useQuery({
-    initialQuery: props.fallbackText,
+    initialQuery,
     forceEnableAutoStart,
     forceEnableAutoLoadSelected,
     forceEnableAutoLoadClipboard,
@@ -56,7 +67,7 @@ export default function getBase(
         </ActionPanel>
       }
     >
-      <ContentView query={query} history={history} mode={mode} setMode={setMode} setSelectedId={setSelectedId} />
+      <ContentView query={query} history={history} mode={mode} setMode={setMode} setSelectedId={setSelectedId} initImg={ocrImg} />
     </List>
   );
 }
