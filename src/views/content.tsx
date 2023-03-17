@@ -27,7 +27,6 @@ export interface ContentViewProps {
   mode: TranslateMode;
   setMode: (value: TranslateMode) => void;
   setSelectedId: (value: string) => void;
-  initImg: string | undefined;
 }
 
 export interface Querying {
@@ -41,7 +40,6 @@ type ViewItem = Querying | Record;
 
 export const ContentView = (props: ContentViewProps) => {
   const { query, history, mode, setMode, setSelectedId } = props;
-  let { initImg } = props
 
   const [data, setData] = useState<ViewItem[]>([]);
   const [querying, setQuerying] = useState<Querying | null>();
@@ -64,7 +62,7 @@ export const ContentView = (props: ContentViewProps) => {
     }
   }
 
-  function onTranslationError(toast: Toast, from: string, title: string, message: string, img: string) {
+  function onTranslationError(toast: Toast, from: string, title: string, message: string, img: string | undefined) {
     (toast.title = title), (toast.message = message);
     toast.style = Toast.Style.Failure;
     const record: Record = {
@@ -94,8 +92,8 @@ export const ContentView = (props: ContentViewProps) => {
     });
     const text = query.text;
     const detectTo = query.to;
-    const img = initImg
-    initImg = undefined
+    const img = query.ocrImage;
+
     console.log("querying")
     const _querying: Querying = {
       hook: query,
@@ -115,11 +113,11 @@ export const ContentView = (props: ContentViewProps) => {
           });
         },
         onFinish: (reason) => {
-          console.log(1,reason, initImg, ref.current)
+          console.log(1,reason, img, ref.current)
           toast.title = "Got your translation!";
           toast.style = Toast.Style.Success;
           if (reason !== "stop") {
-            onTranslationError(toast, detectFrom, "Error", `failed：${reason}`);
+            onTranslationError(toast, detectFrom, "Error", `failed：${reason}`, img);
           } else {
             if (ref.current) {
               const newText =
@@ -147,7 +145,7 @@ export const ContentView = (props: ContentViewProps) => {
           }
         },
         onError: (error) => {
-          onTranslationError(toast, detectFrom, "Error", error);
+          onTranslationError(toast, detectFrom, "Error", error, img);
         },
       },
       id: "querying",
@@ -248,7 +246,7 @@ export const ContentView = (props: ContentViewProps) => {
                 original={querying ? querying.query.text : ""}
                 from={querying ? querying.query.detectFrom : "auto"}
                 mode={querying ? querying.query.mode : "translate"}
-                ocrImg={initImg}
+                ocrImg={ query.ocrImage }
                 to={query.to}
               />
             }
