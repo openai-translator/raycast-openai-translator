@@ -76,7 +76,7 @@ export const ContentView = (props: ContentViewProps) => {
         text: ref.current ?? "",
         error: message,
       },
-      ocrImg: img
+      ocrImg: img,
     };
     history.add(record);
     query.updateQuerying(false);
@@ -94,7 +94,6 @@ export const ContentView = (props: ContentViewProps) => {
     const detectTo = query.to;
     const img = query.ocrImage;
 
-    console.log("querying")
     const _querying: Querying = {
       hook: query,
       controller,
@@ -113,7 +112,6 @@ export const ContentView = (props: ContentViewProps) => {
           });
         },
         onFinish: (reason) => {
-          console.log(1,reason, img, ref.current)
           toast.title = "Got your translation!";
           toast.style = Toast.Style.Success;
           if (reason !== "stop") {
@@ -141,7 +139,6 @@ export const ContentView = (props: ContentViewProps) => {
               history.add(record);
             }
             query.updateQuerying(false);
-
           }
         },
         onError: (error) => {
@@ -246,7 +243,7 @@ export const ContentView = (props: ContentViewProps) => {
                 original={querying ? querying.query.text : ""}
                 from={querying ? querying.query.detectFrom : "auto"}
                 mode={querying ? querying.query.mode : "translate"}
-                ocrImg={ query.ocrImage }
+                ocrImg={query.ocrImage}
                 to={query.to}
               />
             }

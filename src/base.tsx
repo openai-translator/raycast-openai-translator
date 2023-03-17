@@ -14,15 +14,15 @@ export default function getBase(
   forceEnableAutoLoadSelected = false,
   forceEnableAutoLoadClipboard = false
 ) {
-  let initialQuery: string | undefined = ""
-  let ocrImage: string | undefined
-  if(props.launchContext){
-    initialMode = (props.launchContext['mode'] as TranslateMode);
-    initialQuery = props.launchContext['txt'];
-    ocrImage = props.launchContext['img']
+  let initialQuery: string | undefined = "";
+  let ocrImage: string | undefined;
+  if (props.launchContext) {
+    initialMode = props.launchContext["mode"] as TranslateMode;
+    initialQuery = props.launchContext["txt"];
+    ocrImage = props.launchContext["img"];
     forceEnableAutoStart = true;
-  }else{
-    initialQuery = props.fallbackText
+  } else {
+    initialQuery = props.fallbackText;
   }
 
   const [mode, setMode] = useState<TranslateMode>(initialMode);

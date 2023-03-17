@@ -1,7 +1,7 @@
 import { getPreferenceValues, LocalStorage, showToast, Toast } from "@raycast/api";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { TranslateMode, TranslateResult } from "../providers/openai/translate";
-import { promises as fs } from "fs"
+import { promises as fs } from "fs";
 
 export interface Record {
   id: string;
@@ -40,15 +40,13 @@ export function useHistory(): HistoryHook {
   }, [data]);
 
   const add = useCallback(
-
     async (record: Record) => {
-      console.log(`add ${record.created_at}`)
       const max = parseInt(maxHistorySize) || 30;
       const slice = data.length > max ? data.slice(data.length - max, data.length) : data;
-      const remove = data.slice(0, data.length - max)
-      for (let r of remove) {
-        if(r.ocrImg) {
-          await fs.unlink(r.ocrImg)
+      const remove = data.slice(0, data.length - max);
+      for (const r of remove) {
+        if (r.ocrImg) {
+          await fs.unlink(r.ocrImg);
         }
       }
       setData([...slice, record]);
@@ -63,8 +61,8 @@ export function useHistory(): HistoryHook {
         style: Toast.Style.Animated,
       });
       const newHistory: Record[] = data.filter((item) => item.id !== record.id);
-      if(record.ocrImg) {
-        await fs.unlink(record.ocrImg)
+      if (record.ocrImg) {
+        await fs.unlink(record.ocrImg);
       }
       setData(newHistory);
       toast.title = "Record removed!";

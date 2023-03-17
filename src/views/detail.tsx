@@ -10,12 +10,12 @@ export interface DetailViewProps {
   to: string;
   mode: TranslateMode;
   created_at?: string;
-  ocrImg: string | undefined
+  ocrImg: string | undefined;
 }
 
 export const DetailView = (props: DetailViewProps) => {
   const { text, original, from, to, mode, created_at, ocrImg } = props;
-  const imgMd = ocrImg ? `![](${ocrImg})` : ""
+  const imgMd = ocrImg ? `![](${ocrImg})` : "";
   return (
     <List.Item.Detail
       markdown={`\n${text}\n\n\`\`\`\n${original}\n\`\`\`\n${imgMd}`}
