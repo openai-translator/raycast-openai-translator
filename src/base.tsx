@@ -35,13 +35,14 @@ export default function getBase(
     ocrImage,
   });
   const history = useHistory();
-
+  const [isInit, setIsInit] = useState<boolean>(true);
+  const [isEmpty, setIsEmpty] = useState<boolean>(true);
   return (
     <List
       searchText={query.text}
-      isShowingDetail={history.data.length > 0 || query.querying ? true : false}
+      isShowingDetail={!isInit && !isEmpty}
       filtering={false}
-      isLoading={query.isLoading}
+      isLoading={isInit}
       selectedItemId={selectedId}
       searchBarPlaceholder={`${capitalize(mode)}...`}
       onSearchTextChange={query.updateText}
@@ -68,7 +69,15 @@ export default function getBase(
         </ActionPanel>
       }
     >
-      <ContentView query={query} history={history} mode={mode} setMode={setMode} setSelectedId={setSelectedId} />
+      <ContentView
+        query={query}
+        history={history}
+        mode={mode}
+        setMode={setMode}
+        setSelectedId={setSelectedId}
+        setIsInit={setIsInit}
+        setIsEmpty={setIsEmpty}
+      />
     </List>
   );
 }
