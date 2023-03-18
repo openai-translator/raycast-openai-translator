@@ -12,7 +12,7 @@ export interface Record {
 }
 
 export interface HistoryHook {
-  data: Record[];
+  data: Record[] | undefined;
   isLoading: boolean;
   add: (arg: Record) => Promise<void>;
   remove: (arg: Record) => Promise<void>;
@@ -21,23 +21,23 @@ export interface HistoryHook {
 
 export function useHistory(): HistoryHook {
   const { maxHistorySize } = getPreferenceValues<{ maxHistorySize: string }>();
-  const [data, setData] = useState<Record[]>([]);
+  const [data, setData] = useState<Record[]>();
   const countRef = useRef(data);
   const [isLoading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     (async () => {
       const storedHistory = await LocalStorage.getItem<string>("history");
-      if (storedHistory) {
-        setData(JSON.parse(storedHistory));
-        setLoading(false);
-      }
+      setData(storedHistory ? JSON.parse(storedHistory) : []);
+      setLoading(false);
     })();
   }, []);
 
   useEffect(() => {
-    if (countRef.current != data) {
-      countRef.current = data;
+    if (data) {
+      if (countRef.current != data) {
+        countRef.current = data;
+      }
       LocalStorage.setItem("history", JSON.stringify(data));
     }
   }, [data]);
@@ -45,6 +45,7 @@ export function useHistory(): HistoryHook {
   const add = useCallback(
     async (record: Record) => {
       const data = countRef.current;
+      if(data){
       const max = parseInt(maxHistorySize) || 30;
       const slice = data.length > max ? data.slice(data.length - max, data.length) : data;
       const remove = data.length > max ? data.slice(0, data.length - max) : [];
@@ -53,7 +54,8 @@ export function useHistory(): HistoryHook {
           await fs.unlink(r.ocrImg);
         }
       }
-      setData([...slice, record]);
+        setData([...slice, record]);
+      }
     },
     [setData, data]
   );
@@ -61,6 +63,7 @@ export function useHistory(): HistoryHook {
   const remove = useCallback(
     async (record: Record) => {
       const data = countRef.current;
+      if(data){
       const toast = await showToast({
         title: "Removing record...",
         style: Toast.Style.Animated,
@@ -71,7 +74,8 @@ export function useHistory(): HistoryHook {
       }
       setData(newHistory);
       toast.title = "Record removed!";
-      toast.style = Toast.Style.Success;
+        toast.style = Toast.Style.Success;
+      }
     },
     [setData, data]
   );
