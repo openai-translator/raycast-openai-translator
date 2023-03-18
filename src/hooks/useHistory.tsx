@@ -46,14 +46,14 @@ export function useHistory(): HistoryHook {
     async (record: Record) => {
       const data = countRef.current;
       if(data){
-      const max = parseInt(maxHistorySize) || 30;
-      const slice = data.length > max ? data.slice(data.length - max, data.length) : data;
-      const remove = data.length > max ? data.slice(0, data.length - max) : [];
-      for (const r of remove) {
-        if (r.ocrImg) {
-          await fs.unlink(r.ocrImg);
+        const max = parseInt(maxHistorySize) || 30;
+        const slice = data.length > max ? data.slice(data.length - max, data.length) : data;
+        const remove = data.length > max ? data.slice(0, data.length - max) : [];
+        for (const r of remove) {
+          if (r.ocrImg) {
+            await fs.unlink(r.ocrImg);
+          }
         }
-      }
         setData([...slice, record]);
       }
     },
@@ -64,16 +64,16 @@ export function useHistory(): HistoryHook {
     async (record: Record) => {
       const data = countRef.current;
       if(data){
-      const toast = await showToast({
-        title: "Removing record...",
-        style: Toast.Style.Animated,
-      });
-      const newHistory: Record[] = data.filter((item) => item.id !== record.id);
-      if (record.ocrImg) {
-        await fs.unlink(record.ocrImg);
-      }
-      setData(newHistory);
-      toast.title = "Record removed!";
+        const toast = await showToast({
+          title: "Removing record...",
+          style: Toast.Style.Animated,
+        });
+        const newHistory: Record[] = data.filter((item) => item.id !== record.id);
+        if (record.ocrImg) {
+          await fs.unlink(record.ocrImg);
+        }
+        setData(newHistory);
+        toast.title = "Record removed!";
         toast.style = Toast.Style.Success;
       }
     },
@@ -81,7 +81,6 @@ export function useHistory(): HistoryHook {
   );
 
   const clear = useCallback(async () => {
-    const data = countRef.current;
     const toast = await showToast({
       title: "Clearing history...",
       style: Toast.Style.Animated,
