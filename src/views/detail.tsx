@@ -18,7 +18,7 @@ export const DetailView = (props: DetailViewProps) => {
   const imgMd = ocrImg ? `\n![](${ocrImg})` : "";
   return (
     <List.Item.Detail
-      markdown={`${text}${imgMd}\n\`\`\`\n${original}\n\`\`\`\n`}
+      markdown={`${text}\n${imgMd}\n\`\`\`\n${original}\n\`\`\`\n`}
       metadata={
         <Detail.Metadata>
           {mode != "what" ? <Detail.Metadata.Label title="From" text={`${langMap.get(from) || "Auto"}`} /> : null}
