@@ -13,46 +13,30 @@ function screencapture(file: string) {
   return status;
 }
 
-function setupEnv() {
-  const shell = `${environment.assetsPath}/setup.sh`;
-  const { status, stdout, stderr } = spawnSync(
-    "/usr/bin/osascript",
-    [
-      "-e",
-      `tell application "Terminal" to do script "/bin/sh ${shell}"`,
-      "-e",
-      'tell application "Terminal" to activate',
-    ],
-    { stdio: "ignore" }
-  );
-  if (status != 0) {
-    showHUD(`Setup Failed!`);
-  }
-}
-
 export default async function Command() {
-  const { mode } = getPreferenceValues<{ mode: TranslateMode }>();
-  const ocrPath = `${environment.assetsPath}/ocr`;
-  const python = `${environment.assetsPath}/venv/bin/python`;
-  const vision = `${environment.assetsPath}/vision.py`;
+  const { mode, language, level, customWords } = getPreferenceValues<{ mode: TranslateMode, language: string, level: string, customWords: string }>();
+  const ocrPath = `${environment.assetsPath}/ocr_img`;
+  const binary = `${environment.assetsPath}/ocr`;
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-  if (!fs.existsSync(python)) {
-    setupEnv();
-  } else {
-    const tmpFile = `${ocrPath}/${Date.now()}.png`;
-    await fs.promises.mkdir(ocrPath, { recursive: true });
-    screencapture(tmpFile);
-    if (fs.existsSync(tmpFile)) {
-      showHUD("Processing...");
-      await delay(1);
-      const { status, stdout, stderr } = spawnSync(python, [`${environment.assetsPath}/vision.py`, tmpFile, mode], {
-        stdio: "ignore",
-      });
-      if (status != 0) {
-        showHUD(`Failed:${stderr ? stderr.toString() : "none"}`);
-      }
-    } else {
-      showHUD("Cancel");
+  const tmpFile = `${ocrPath}/${Date.now()}.png`;
+  await fs.promises.mkdir(ocrPath, { recursive: true });
+  screencapture(tmpFile);
+  if (fs.existsSync(tmpFile)) {
+    showHUD("Processing...");
+    await delay(1);
+    console.log(binary)
+    console.log([tmpFile, language, `"${customWords}"`, level, mode])
+    const { status, output, stdout, stderr, error } = spawnSync(binary, [tmpFile, language, `"${customWords}"`, level, mode]);
+    console.log(status)
+    console.log(output)
+    console.log(error)
+    console.log(stdout ? stdout.toString(): "none")
+
+    if (status != 0) {
+      showHUD(`Failed:${stderr ? stderr.toString() : "none"}`);
     }
+  } else {
+    showHUD("Cancel");
   }
+
 }
