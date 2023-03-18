@@ -42,6 +42,16 @@ export function useHistory(): HistoryHook {
     }
   }, [data]);
 
+  const unlink = async function(r: Record) {
+    if (r.ocrImg) {
+      try{
+        await fs.unlink(r.ocrImg);
+      }catch {
+        //
+      }
+    }
+  }
+
   const add = useCallback(
     async (record: Record) => {
       const data = countRef.current;
@@ -50,9 +60,7 @@ export function useHistory(): HistoryHook {
         const slice = data.length > max ? data.slice(data.length - max, data.length) : data;
         const remove = data.length > max ? data.slice(0, data.length - max) : [];
         for (const r of remove) {
-          if (r.ocrImg) {
-            await fs.unlink(r.ocrImg);
-          }
+          await unlink(r)
         }
         setData([...slice, record]);
       }
@@ -69,9 +77,7 @@ export function useHistory(): HistoryHook {
           style: Toast.Style.Animated,
         });
         const newHistory: Record[] = data.filter((item) => item.id !== record.id);
-        if (record.ocrImg) {
-          await fs.unlink(record.ocrImg);
-        }
+        await unlink(record)
         setData(newHistory);
         toast.title = "Record removed!";
         toast.style = Toast.Style.Success;
@@ -81,14 +87,20 @@ export function useHistory(): HistoryHook {
   );
 
   const clear = useCallback(async () => {
-    const toast = await showToast({
-      title: "Clearing history...",
-      style: Toast.Style.Animated,
-    });
-    setData([]);
-    toast.title = "History cleared!";
-    toast.style = Toast.Style.Success;
-  }, [setData]);
+    const data = countRef.current;
+    if(data){
+      const toast = await showToast({
+        title: "Clearing history...",
+        style: Toast.Style.Animated,
+      });
+      for (const r of data) {
+        await unlink(r)
+      }
+      setData([]);
+      toast.title = "History cleared!";
+      toast.style = Toast.Style.Success;
+    }
+  }, [setData, data]);
 
   return useMemo(() => ({ data, isLoading, add, remove, clear }), [data, isLoading, add, remove, clear]);
 }

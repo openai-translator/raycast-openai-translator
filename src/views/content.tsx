@@ -51,7 +51,6 @@ export const ContentView = (props: ContentViewProps) => {
 
   const ref = useRef<string>();
   function updateData() {
-    console.log("updateData", data, history.data, querying);
     if (history.data) {
       const sortedResults = history.data.sort(
         (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()

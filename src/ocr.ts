@@ -24,14 +24,7 @@ export default async function Command() {
   if (fs.existsSync(tmpFile)) {
     showHUD("Processing...");
     await delay(1);
-    console.log(binary)
-    console.log([tmpFile, language, `"${customWords}"`, level, mode])
     const { status, output, stdout, stderr, error } = spawnSync(binary, [tmpFile, language, `"${customWords}"`, level, mode]);
-    console.log(status)
-    console.log(output)
-    console.log(error)
-    console.log(stdout ? stdout.toString(): "none")
-
     if (status != 0) {
       showHUD(`Failed:${stderr ? stderr.toString() : "none"}`);
     }
