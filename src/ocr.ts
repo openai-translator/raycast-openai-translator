@@ -1,4 +1,4 @@
-import { environment, getPreferenceValues, showHUD, updateCommandMetadata } from "@raycast/api";
+import { environment, getPreferenceValues, launchCommand, LaunchType, showHUD, updateCommandMetadata } from "@raycast/api";
 import { spawn, spawnSync } from "child_process";
 import fs from "fs";
 import { TranslateMode } from "./providers/openai/translate";
@@ -25,6 +25,17 @@ export default async function Command() {
     showHUD("Processing...");
     await delay(1);
     const { status, output, stdout, stderr, error } = spawnSync(binary, [tmpFile, language, `"${customWords}"`, level, mode]);
+
+    await launchCommand({
+      name: mode,
+      type: LaunchType.UserInitiated,
+      context: {
+        txt: stdout.toString(),
+        mode,
+        img: tmpFile
+      }
+    })
+
     if (status != 0) {
       showHUD(`Failed:${stderr ? stderr.toString() : "none"}`);
     }
