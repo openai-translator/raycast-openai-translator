@@ -32,12 +32,12 @@ request.recognitionLevel = (level == "fast" ? .fast : .accurate)
 do {
     try requestHandler.perform([request])
 } catch {
-    print("Error: \(error.localizedDescription)")
+    fputs("Error: \(error.localizedDescription)", stderr)
     exit(1)
 }
 
 guard let observations = request.results else {
-    print("Error: could not get text recognition results")
+    fputs("Error: could not get text recognition results", stderr)
     exit(1)
 }
 
@@ -84,7 +84,7 @@ for observation in observations {
 let outputURL = URL(fileURLWithPath: imagePath)
 
 guard let imageData = imageRef.tiffRepresentation else {
-    print("Error: could not get image data")
+    fputs("Error: could not get image data", stderr)
     exit(1)
 }
 
@@ -92,32 +92,37 @@ let bitmapImageRep = NSBitmapImageRep(data: imageData)
 let properties: [NSBitmapImageRep.PropertyKey : Any] = [:]
 
 guard let pngData = bitmapImageRep?.representation(using: .png, properties: properties) else {
-    print("Error: could not convert image to PNG data")
+    fputs("Error: could not convert image to PNG data", stderr)
     exit(1)
 }
 
 do {
     try pngData.write(to: outputURL)
 } catch {
-    print("Error: \(error.localizedDescription)")
+    fputs("Error: \(error.localizedDescription)", stderr)
     exit(1)
 }
 
-print("Text recognition completed. Result saved to \(imagePath).")
-
-let absolutePath = URL(fileURLWithPath: imagePath, relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath)).standardizedFileURL.path
-
-
-var responseMessages = ["txt": output,
-                        "mode": mode,
-                        "img": absolutePath]
-do {
-    let jsonData = try JSONSerialization.data(withJSONObject: responseMessages, options: [])
-    if let jsonString = String(data: jsonData, encoding: .utf8) {
-        let encodedString = jsonString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let url = URL(string: "raycast://extensions/douo/openai-translator/translate?context=\(encodedString)")
-        NSWorkspace.shared.open(url!)
-    }
-} catch {
-    print("Error converting dictionary to JSON: \(error.localizedDescription)")
+if(output.count == 0){
+    fputs("Error: Not text found", stderr)
+    exit(1)
 }
+
+print(output)
+
+// let absolutePath = URL(fileURLWithPath: imagePath, relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath)).standardizedFileURL.path
+
+
+// var responseMessages = ["txt": output,
+//                         "mode": mode,
+//                         "img": absolutePath]
+// do {
+//     let jsonData = try JSONSerialization.data(withJSONObject: responseMessages, options: [])
+//     if let jsonString = String(data: jsonData, encoding: .utf8) {
+//         let encodedString = jsonString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+//         let url = URL(string: "raycast://extensions/douo/openai-translator/translate?context=\(encodedString)")
+//         NSWorkspace.shared.open(url!)
+//     }
+// } catch {
+//     print("Error converting dictionary to JSON: \(error.localizedDescription)")
+// }
