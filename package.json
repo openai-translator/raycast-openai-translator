@@ -110,7 +110,7 @@
     {
       "name": "ocr",
       "title": "Query OCR",
-      "description": "Query text from image using ocr",
+      "description": "Query text from image",
       "mode": "no-view",
       "preferences": [
         {
@@ -203,6 +203,24 @@
           "default": "",
           "description": "An array of strings to supplement the recognized languages at the word-recognition stage.",
           "placeholder": "An array of words split by ', '. ex: a, b, c"
+        },
+        {
+          "name": "callbackType",
+          "type": "dropdown",
+          "required": false,
+          "title": "Callback Type",
+          "default": "deeplink",
+          "description": "Determine how ocr command lauch the query command",
+          "data": [
+            {
+              "value": "deeplink",
+              "title": "Deeplink"
+            },
+            {
+              "value": "launchCommand",
+              "title": "launchCommand"
+            }
+          ]
         }
       ]
     }
