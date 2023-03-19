@@ -72,7 +72,7 @@ for observation in observations {
 
     if output.count == 0 {
         output = topCandidate.string
-    }else if previousHeight > 0 && abs(y - previousY) < (height + previousHeight)/2 {
+    }else if previousHeight > 0 && abs(y - previousY) < (height + previousHeight)/3 {
         output += "\t\(topCandidate.string)"
     } else {
         output += "\n\(topCandidate.string)"
