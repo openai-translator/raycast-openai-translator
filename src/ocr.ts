@@ -26,7 +26,7 @@ export default async function Command() {
     await delay(1);
     const { status, output, stdout, stderr, error } = spawnSync(binary, [tmpFile, language, `"${customWords}"`, level, mode]);
 
-    await launchCommand({
+    launchCommand({
       name: mode,
       type: LaunchType.UserInitiated,
       context: {
