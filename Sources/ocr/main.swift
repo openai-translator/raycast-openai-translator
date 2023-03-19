@@ -5,6 +5,7 @@ import QuartzCore
 
 let args = CommandLine.arguments
 
+let deeplink = args[args.count - 6]
 let imagePath = args[args.count - 5]
 let preferLang = args[args.count - 4]
 let customWords = args[args.count - 3]
@@ -108,21 +109,22 @@ if(output.count == 0){
     exit(1)
 }
 
-print(output)
+if(deeplink == "deeplink"){
+    let absolutePath = URL(fileURLWithPath: imagePath, relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath)).standardizedFileURL.path
 
-// let absolutePath = URL(fileURLWithPath: imagePath, relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath)).standardizedFileURL.path
-
-
-// var responseMessages = ["txt": output,
-//                         "mode": mode,
-//                         "img": absolutePath]
-// do {
-//     let jsonData = try JSONSerialization.data(withJSONObject: responseMessages, options: [])
-//     if let jsonString = String(data: jsonData, encoding: .utf8) {
-//         let encodedString = jsonString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-//         let url = URL(string: "raycast://extensions/douo/openai-translator/translate?context=\(encodedString)")
-//         NSWorkspace.shared.open(url!)
-//     }
-// } catch {
-//     print("Error converting dictionary to JSON: \(error.localizedDescription)")
-// }
+    let responseMessages = ["txt": output,
+                            "mode": mode,
+                            "img": absolutePath]
+    do {
+        let jsonData = try JSONSerialization.data(withJSONObject: responseMessages, options: [])
+        if let jsonString = String(data: jsonData, encoding: .utf8) {
+            let encodedString = jsonString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            let url = URL(string: "raycast://extensions/douo/openai-translator/translate?context=\(encodedString)")
+            NSWorkspace.shared.open(url!)
+        }
+    } catch {
+        print("Error converting dictionary to JSON: \(error.localizedDescription)")
+    }
+}else{
+    print(output)
+}

@@ -42,25 +42,25 @@ export function useHistory(): HistoryHook {
     }
   }, [data]);
 
-  const unlink = async function(r: Record) {
+  const unlink = async function (r: Record) {
     if (r.ocrImg) {
-      try{
+      try {
         await fs.unlink(r.ocrImg);
-      }catch {
+      } catch {
         //
       }
     }
-  }
+  };
 
   const add = useCallback(
     async (record: Record) => {
       const data = countRef.current;
-      if(data){
+      if (data) {
         const max = parseInt(maxHistorySize) || 30;
         const slice = data.length > max ? data.slice(data.length - max, data.length) : data;
         const remove = data.length > max ? data.slice(0, data.length - max) : [];
         for (const r of remove) {
-          await unlink(r)
+          await unlink(r);
         }
         setData([...slice, record]);
       }
@@ -71,13 +71,13 @@ export function useHistory(): HistoryHook {
   const remove = useCallback(
     async (record: Record) => {
       const data = countRef.current;
-      if(data){
+      if (data) {
         const toast = await showToast({
           title: "Removing record...",
           style: Toast.Style.Animated,
         });
         const newHistory: Record[] = data.filter((item) => item.id !== record.id);
-        await unlink(record)
+        await unlink(record);
         setData(newHistory);
         toast.title = "Record removed!";
         toast.style = Toast.Style.Success;
@@ -88,13 +88,13 @@ export function useHistory(): HistoryHook {
 
   const clear = useCallback(async () => {
     const data = countRef.current;
-    if(data){
+    if (data) {
       const toast = await showToast({
         title: "Clearing history...",
         style: Toast.Style.Animated,
       });
       for (const r of data) {
-        await unlink(r)
+        await unlink(r);
       }
       setData([]);
       toast.title = "History cleared!";
