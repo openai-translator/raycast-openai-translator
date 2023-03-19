@@ -1,8 +1,10 @@
 import {
+  closeMainWindow,
   environment,
   getPreferenceValues,
   launchCommand,
   LaunchType,
+  PopToRootType,
   showHUD,
   updateCommandMetadata,
 } from "@raycast/api";
@@ -20,7 +22,7 @@ function screencapture(file: string) {
   return status;
 }
 
-type CallbackType = "deeplink" | "lauchCommand";
+type CallbackType = "deeplink" | "launchCommand";
 
 export default async function Command() {
   const { mode, language, level, customWords, callbackType } = getPreferenceValues<{
@@ -30,6 +32,7 @@ export default async function Command() {
     customWords: string;
     callbackType: CallbackType;
   }>();
+  await closeMainWindow({ clearRootSearch: true });
   const ocrPath = `${environment.assetsPath}/ocr_img`;
   const binary = `${environment.assetsPath}/ocr`;
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -50,7 +53,7 @@ export default async function Command() {
     if (status != 0) {
       showHUD(`Failed:${stderr ? stderr.toString() : "none"}`);
     } else {
-      if (callbackType == "lauchCommand") {
+      if (callbackType == "launchCommand") {
         //FIXME lauchCommand always push new instance to ui stack
         await launchCommand({
           name: mode,
