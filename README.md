@@ -36,6 +36,20 @@ npm install && npm run dev
 
 获取你的 [OpenAI](https://platform.openai.com/account/api-keys) API Key.
 
+## 主要功能
+
+- 划词翻译
+- 截图翻译
+- 剪切板文本翻译
+- 可绑定全局快捷键
+
+<img width="1000" alt="openai-translator-10" src="https://user-images.githubusercontent.com/743074/226171648-d138308b-837e-4b79-a84e-3f2173958066.png">
+
+
+![Actions](doc/actions.png)
+
+## 翻译模式
+
 感谢 [yetone/openai-translator](https://github.com/yetone/openai-translator)：
 
 - 翻译
@@ -50,16 +64,7 @@ npm install && npm run dev
 
 ![What](doc/what-zh.png)
 
-来自 Raycast
-
-- 自动导入当前选择文本
-- 自动导入剪切板文本
-- 可绑定全局快捷键
-
-![Actions](doc/actions.png)
-
-
-其他
+## 其他
 
 - 历史记录
 - 文本复制
@@ -93,6 +98,4 @@ https://user-images.githubusercontent.com/743074/224528436-afca923d-b781-4754-86
 # OCR
 
 https://user-images.githubusercontent.com/743074/225798866-d3ef4e6a-53e7-4281-a026-16a5c574f074.mov
-
-代码在 [edge](https://github.com/douo/raycast-openai-translator/tree/edge) 分支。
 
