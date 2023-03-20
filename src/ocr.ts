@@ -38,6 +38,11 @@ export default async function Command() {
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
   const tmpFile = `${ocrPath}/${Date.now()}.png`;
   await fs.promises.mkdir(ocrPath, { recursive: true });
+  try {
+    await fs.promises.access(binary, fs.constants.X_OK);
+  } catch {
+    await fs.promises.chmod(binary, 0o775);
+  }
   screencapture(tmpFile);
   if (fs.existsSync(tmpFile)) {
     showHUD("Processing...");
