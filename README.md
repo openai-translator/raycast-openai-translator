@@ -90,13 +90,3 @@ npm install && npm run dev
 
 ![打开全局快捷键](doc/query-selected.png)
 
-全键盘操作的效果：
-
-https://user-images.githubusercontent.com/743074/224528436-afca923d-b781-4754-86f5-e6b439b3e9e9.mov
-
-
-
-
-# OCR
-
-https://user-images.githubusercontent.com/743074/225798866-d3ef4e6a-53e7-4281-a026-16a5c574f074.mov
