@@ -2,7 +2,9 @@
 
 基于 ChatGPT API 的 [Raycast](https://www.raycast.com/) 翻译扩展。
 
-https://user-images.githubusercontent.com/743074/224527077-8256a26a-bbeb-482e-86fa-74fe435e59fe.mov
+
+https://user-images.githubusercontent.com/743074/226975894-de840861-d1c9-4c9e-8fe1-636f568570fe.mov
+
 
 # Insipired By
 
@@ -16,6 +18,10 @@ https://user-images.githubusercontent.com/743074/224527077-8256a26a-bbeb-482e-86
 
 # 安装
 
+## 商店
+
+[Raycast OpenAI Translator](https://www.raycast.com/douo/openai-translator)
+
 ## 手动
 
 ``` shell
@@ -25,10 +31,6 @@ npm install && npm run dev
 ```
 
 扩展成功显示后就可以 `Ctrl-c` 结束 npm 进程，扩展能继续使用。
-
-## 商店
-
-等待 Raycast 审核: https://github.com/raycast/extensions/pull/5306
 
 # 功能
 
