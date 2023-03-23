@@ -2,7 +2,6 @@
 
 基于 ChatGPT API 的 [Raycast](https://www.raycast.com/) 翻译扩展。
 
-
 https://user-images.githubusercontent.com/743074/226975894-de840861-d1c9-4c9e-8fe1-636f568570fe.mov
 
 
@@ -43,9 +42,9 @@ npm install && npm run dev
 - 划词翻译
 - 截图翻译
 - 剪切板文本翻译
-- 可绑定全局快捷键
+- 可绑定全局快捷键(需要手动去 Raycast 插件配置页配置)
 
-
+![openai-translator-10](https://user-images.githubusercontent.com/743074/226171648-d138308b-837e-4b79-a84e-3f2173958066.png)
 
 ![Actions](doc/actions.png)
 
@@ -89,4 +88,3 @@ npm install && npm run dev
   3. 确保 "Query Mode" 为 "Translate"
 
 ![打开全局快捷键](doc/query-selected.png)
-
