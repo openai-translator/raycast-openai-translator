@@ -226,6 +226,40 @@
       "required": true
     },
     {
+      "name": "apiModel",
+      "type": "dropdown",
+      "required": false,
+      "title": "API Model",
+      "default": "gpt-3.5-turbo",
+      "description": "Choice API Model",
+      "data": [
+        {
+          "value": "gpt-3.5-turbo",
+          "title": "gpt-3.5-turbo"
+        },
+        {
+          "value": "gpt-3.5-turbo-0301",
+          "title": "gpt-3.5-turbo-0301"
+        },
+        {
+          "value": "gpt-4",
+          "title": "gpt-4"
+        },
+        {
+          "value": "gpt-4-0314",
+          "title": "gpt-4-0314"
+        },
+        {
+          "value": "gpt-4-32k",
+          "title": "gpt-4-32k"
+        },
+        {
+          "value": "gpt-4-32k-0314",
+          "title": "gpt-4-32k-0314"
+        }
+      ]
+    },
+    {
       "name": "toLang",
       "type": "dropdown",
       "required": true,

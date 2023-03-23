@@ -25,7 +25,7 @@ export interface TranslateResult {
 
 const chineseLangs = ["zh", "zh-CN", "zh-TW", "zh-Hans", "zh-Hant", "wyw", "yue"];
 
-export async function translate(query: TranslateQuery, entrypoint: string, apiKey: string) {
+export async function translate(query: TranslateQuery, entrypoint: string, apiKey: string, model: string) {
   const headers: Record<string, string> =
     apiKey == "none"
       ? { "Content-Type": "application/json" }
@@ -82,7 +82,7 @@ export async function translate(query: TranslateQuery, entrypoint: string, apiKe
       break;
   }
   const body = {
-    model: "gpt-3.5-turbo",
+    model,
     temperature: 0,
     max_tokens: 1000,
     top_p: 1,
