@@ -264,15 +264,19 @@
       "type": "dropdown",
       "required": true,
       "title": "Translate to",
-      "default": "zh",
+      "default": "zh-Hans",
       "data": [
         {
           "value": "en",
           "title": "English"
         },
         {
-          "value": "zh",
-          "title": "中文"
+          "value": "zh-Hans",
+          "title": "简体中文"
+        },
+        {
+          "value": "zh-Hant",
+          "title": "正體中文"
         },
         {
           "value": "yue",
