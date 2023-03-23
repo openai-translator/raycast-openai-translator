@@ -47,8 +47,7 @@ export const ContentView = (props: ContentViewProps) => {
   const [data, setData] = useState<ViewItem[]>();
   const [querying, setQuerying] = useState<Querying | null>();
   const [translatedText, setTranslatedText] = useState("");
-  const { entrypoint, apikey } = getPreferenceValues<{ entrypoint: string; apikey: string }>();
-
+  const { entrypoint, apikey, apiModel } = getPreferenceValues<{ entrypoint: string; apikey: string; apiModel: string }>();
   const ref = useRef<string>();
   function updateData() {
     if (history.data) {
@@ -157,7 +156,7 @@ export const ContentView = (props: ContentViewProps) => {
     setTranslatedText("");
     setQuerying(_querying);
     query.updateText("");
-    translate(_querying.query, entrypoint, apikey);
+    translate(_querying.query, entrypoint, apikey, apiModel);
   }
 
   useEffect(() => {
