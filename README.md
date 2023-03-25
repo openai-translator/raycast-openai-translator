@@ -83,7 +83,7 @@ npm install && npm run dev
 # 如何配置划词搜索
 
 - 进入扩展配置（`⌘+⇧+,`）
-  1. 选择 "Query Seleceted"
+  1. 选择 "Query Selected"
   2. 如下图所示配置快捷键
   3. 确保 "Query Mode" 为 "Translate"
 
