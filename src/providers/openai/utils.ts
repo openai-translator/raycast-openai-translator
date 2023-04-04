@@ -9,9 +9,23 @@ interface FetchSSEOptions extends RequestInit {
 }
 
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
-  const { onMessage, onError, ...fetchOptions } = options;
+  const { onMessage, onError, signal: originSignal, ...fetchOptions } = options;
+  const timeout = 10 * 1000
+  let abortByTimeout = false
   try {
-    const resp = await fetch(input, fetchOptions);
+    const ctrl = new AbortController();
+    const { signal } = ctrl
+
+    if(originSignal){
+      originSignal.addEventListener('abort', () => ctrl.abort())
+    }
+
+    const timerId = setTimeout(() =>{
+      abortByTimeout = true
+      ctrl.abort()
+    }, timeout)
+    const resp = await fetch(input,  {...fetchOptions, signal});
+    clearTimeout(timerId)
     if (resp.status !== 200) {
       onError(await resp.json());
       return;
@@ -30,6 +44,11 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
       }
     }
   } catch (error) {
-    onError({ error });
+    console.log(abortByTimeout)
+    if(abortByTimeout){
+      onError({ error :{message: "Connection Timeout"}})
+    }else{
+      onError({ error });
+    }
   }
 }
