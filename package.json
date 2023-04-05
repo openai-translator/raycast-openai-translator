@@ -525,6 +525,43 @@
       "title": "Max History Size",
       "required": false,
       "default": "30"
+    },
+    {
+      "name": "useProxy",
+      "label": "Enable proxy for each request",
+      "description": "Each request will be passed through the proxy",
+      "type": "checkbox",
+      "title": "Use Proxy",
+      "required": false,
+      "default": false
+    },
+    {
+      "name": "proxyHost",
+      "description": "Sever address of the proxy",
+      "type": "textfield",
+      "title": "Socks5 Proxy Host",
+      "required": false
+    },
+    {
+      "name": "proxyPort",
+      "description": "Server port of the proxy",
+      "type": "textfield",
+      "title": "Socks5 Proxy Port",
+      "required": false
+    },
+    {
+      "name": "proxyUsername",
+      "description": "Leave empty if doesn't have",
+      "type": "textfield",
+      "title": "Socks5 Proxy Username",
+      "required": false
+    },
+    {
+      "name": "proxyPassword",
+      "description": "Leave empty if doesn't have",
+      "type": "password",
+      "title": "Socks5 Proxy Password",
+      "required": false
     }
   ],
   "dependencies": {
@@ -534,6 +571,7 @@
     "guesslanguage-ng": "^0.0.2",
     "languagedetect": "^2.0.0",
     "node-fetch": "^3.3.0",
+    "socks-proxy-agent": "^7.0.0",
     "uuid": "^9.0.0",
     "xregexp": "^5.1.1"
   },

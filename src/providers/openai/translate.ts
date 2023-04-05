@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import * as lang from "./lang";
 import { fetchSSE } from "./utils";
-
+import { SocksProxyAgent } from "socks-proxy-agent";
 export type TranslateMode = "translate" | "polishing" | "summarize" | "what";
 
 export interface TranslateQuery {
@@ -13,6 +13,7 @@ export interface TranslateQuery {
   onError: (error: string) => void;
   onFinish: (reason: string) => void;
   signal: AbortSignal;
+  agent?: SocksProxyAgent;
 }
 
 export interface TranslateResult {
@@ -26,15 +27,15 @@ export interface TranslateResult {
 const chineseLangs = ["zh", "zh-CN", "zh-TW", "zh-Hans", "zh-Hant", "wyw", "yue"];
 
 const isAWord = (lang: string, text: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const Segmenter = (Intl as any).Segmenter
-    if (!Segmenter) {
-        return false
-    }
-    const segmenter = new Segmenter(lang, { granularity: 'word' })
-    const iterator = segmenter.segment(text)[Symbol.iterator]()
-    return iterator.next().value.segment === text
-}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Segmenter = (Intl as any).Segmenter;
+  if (!Segmenter) {
+    return false;
+  }
+  const segmenter = new Segmenter(lang, { granularity: "word" });
+  const iterator = segmenter.segment(text)[Symbol.iterator]();
+  return iterator.next().value.segment === text;
+};
 
 export async function translate(query: TranslateQuery, entrypoint: string, apiKey: string, model: string) {
   const headers: Record<string, string> =
@@ -64,8 +65,8 @@ export async function translate(query: TranslateQuery, entrypoint: string, apiKe
           }。请列出3种（如果有）最常用翻译结果：单词或短语，并列出对应的适用语境（用中文阐述）、音标、词性、双语示例。按照下面格式用中文阐述：
                         <序号><单词或短语> · /<音标>
                         [<词性缩写>] <适用语境（用中文阐述）>
-                        例句：<例句>(例句翻译)`
-          assistantPrompt = ''
+                        例句：<例句>(例句翻译)`;
+          assistantPrompt = "";
         }
       }
       if (toChinese && isAWord(query.detectFrom, query.text.trim())) {
@@ -75,7 +76,7 @@ export async function translate(query: TranslateQuery, entrypoint: string, apiKe
                 [<语种>] · / <单词音标>
                 [<词性缩写>] <中文含义>]
                 例句：
-                <序号><例句>(例句翻译)`
+                <序号><例句>(例句翻译)`;
       }
       break;
     case "what":
@@ -130,12 +131,12 @@ export async function translate(query: TranslateQuery, entrypoint: string, apiKe
   };
 
   let isFirst = true;
-
   await fetchSSE(`${entrypoint}`, {
     method: "POST",
     headers,
     body: JSON.stringify(body),
     signal: query.signal,
+    agent: query.agent,
     onMessage: (msg) => {
       let resp;
       try {
