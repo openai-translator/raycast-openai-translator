@@ -211,7 +211,7 @@
     {
       "name": "apikey",
       "label": "OpenAI API Key",
-      "description": "Enter your personal OpenAI API Key,  Type 'none' if your entrypoint do not require an API key.",
+      "description": "Enter your personal OpenAI API Key,  Type 'none' if your entrypoint do not require an API key or you are a Raycast PRO user.",
       "type": "password",
       "title": "OpenAI API Key",
       "required": true
@@ -565,7 +565,7 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.48.4",
+    "@raycast/api": "^1.51.1",
     "capitalize": "^2.0.4",
     "eventsource-parser": "^0.1.0",
     "guesslanguage-ng": "^0.0.2",
