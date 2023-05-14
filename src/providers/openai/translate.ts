@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import * as lang from "./lang";
-import { fetchSSE } from "./utils";
+import { fetchSSE, raycast } from "./utils";
 import { SocksProxyAgent } from "socks-proxy-agent";
 export type TranslateMode = "translate" | "polishing" | "summarize" | "what";
 
@@ -37,11 +37,13 @@ const isAWord = (lang: string, text: string) => {
   return iterator.next().value.segment === text;
 };
 
-export async function translate(query: TranslateQuery, entrypoint: string, apiKey: string, model: string) {
-  const headers: Record<string, string> =
-    apiKey == "none"
-      ? { "Content-Type": "application/json" }
-      : { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` };
+export async function translate(
+  query: TranslateQuery,
+  entrypoint: string,
+  apiKey: string,
+  model: string,
+  provider: string
+) {
   const fromChinese = chineseLangs.indexOf(query.detectFrom) > 0;
   const toChinese = chineseLangs.indexOf(query.detectTo) > 0;
   let systemPrompt = "You are a translation engine that can only translate text and cannot interpret it.";
@@ -116,7 +118,47 @@ export async function translate(query: TranslateQuery, entrypoint: string, apiKe
     top_p: 1,
     frequency_penalty: 1,
     presence_penalty: 1,
-    messages: [
+    stream: true,
+  };
+
+  let isFirst = true;
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  let isChatAPI = true;
+  if (provider === "Azure" && entrypoint.indexOf("/chat/completions") < 0) {
+    // Azure OpenAI Service supports multiple API.
+    // We should check if the settings.apiURLPath is match `/deployments/{deployment-id}/chat/completions`.
+    // If not, we should use the legacy parameters.
+    isChatAPI = false;
+    body[
+      "prompt"
+    ] = `<|im_start|>system\n${systemPrompt}\n<|im_end|>\n<|im_start|>user\n${assistantPrompt}\n${query.text}\n<|im_end|>\n<|im_start|>assistant\n`;
+    body["stop"] = ["<|im_end|>"];
+    // } else if (settings.provider === 'ChatGPT') {
+    //     let resp: Response | null = null
+    //     resp = await backgroundFetch(utils.defaultChatGPTAPIAuthSession, { signal: query.signal })
+    //     const respJson = await resp?.json()
+    //     apiKey = respJson.accessToken
+    //     body = {
+    //         action: 'next',
+    //         messages: [
+    //             {
+    //                 id: utils.generateUUID(),
+    //                 role: 'user',
+    //                 content: {
+    //                     content_type: 'text',
+    //                     parts: [rolePrompt + '\n\n' + commandPrompt + ':\n' + `${contentPrompt}`],
+    //                 },
+    //             },
+    //         ],
+    //         model: settings.apiModel, // 'text-davinci-002-render-sha'
+    //         parent_message_id: utils.generateUUID(),
+    //     }
+  } else {
+    const messages = [
       {
         role: "system",
         content: systemPrompt,
@@ -126,12 +168,23 @@ export async function translate(query: TranslateQuery, entrypoint: string, apiKe
         content: assistantPrompt,
       },
       { role: "user", content: `"${query.text}"` },
-    ],
-    stream: true,
-  };
+    ];
+    body["messages"] = messages;
+  }
 
-  let isFirst = true;
-  await fetchSSE(`${entrypoint}`, {
+  switch (provider) {
+    case "openai":
+    case "chatgpt":
+      if (apiKey != "none") {
+        headers["Authorization"] = `Bearer ${apiKey}`;
+      }
+      break;
+    case "azure":
+      headers["api-key"] = `${apiKey}`;
+      break;
+  }
+
+  const options = {
     method: "POST",
     headers,
     body: JSON.stringify(body),
@@ -150,27 +203,40 @@ export async function translate(query: TranslateQuery, entrypoint: string, apiKe
       if (!choices || choices.length === 0) {
         return { error: "No result" };
       }
-      const { delta, finish_reason: finishReason } = choices[0];
+      const { finish_reason: finishReason } = choices[0];
       if (finishReason) {
         query.onFinish(finishReason);
         return;
       }
-      const { content = "", role } = delta;
-      let targetTxt = content;
 
-      if (isFirst && targetTxt && ["“", '"', "「"].indexOf(targetTxt[0]) >= 0) {
-        targetTxt = targetTxt.slice(1);
+      let targetTxt = "";
+      if (!isChatAPI) {
+        targetTxt = choices[0].text;
+        if (isFirst && targetTxt && ["“", '"', "「"].indexOf(targetTxt[0]) >= 0) {
+          targetTxt = targetTxt.slice(1);
+        }
+        query.onMessage({ content: targetTxt, role: "" });
+      } else {
+        const { content = "", role } = choices[0].delta;
+        let targetTxt = content;
+        if (isFirst && targetTxt && ["“", '"', "「"].indexOf(targetTxt[0]) >= 0) {
+          targetTxt = targetTxt.slice(1);
+        }
+
+        if (!role) {
+          isFirst = false;
+        }
+        query.onMessage({ content: targetTxt, role });
       }
-
-      if (!role) {
-        isFirst = false;
-      }
-
-      query.onMessage({ content: targetTxt, role });
     },
     onError: (err) => {
       const { error } = err;
       query.onError(error.message);
     },
-  });
+  };
+  if (provider == "raycast") {
+    await raycast(options);
+  } else {
+    await fetchSSE(`${entrypoint}`, options);
+  }
 }

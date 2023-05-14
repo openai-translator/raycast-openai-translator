@@ -8,7 +8,7 @@ interface FetchSSEOptions extends RequestInit {
   onError(error: any): void;
 }
 
-async function openai(input: string, options: FetchSSEOptions) {
+export async function fetchSSE(input: string, options: FetchSSEOptions) {
   const proxy = "socks5://localhost:1080";
 
   const { onMessage, onError, signal: originSignal, ...fetchOptions } = options;
@@ -55,7 +55,7 @@ async function openai(input: string, options: FetchSSEOptions) {
   }
 }
 
-async function raycastai(options: FetchSSEOptions) {
+export async function raycast(options: FetchSSEOptions) {
   const { onMessage, onError, signal: originSignal, body } = options;
   const timeout = 15 * 1000;
   let abortByTimeout = false;
@@ -84,7 +84,7 @@ async function raycastai(options: FetchSSEOptions) {
 
     clearTimeout(timerId);
 
-    const msgCreator = (finishReason: string|null) => (
+    const msgCreator = (finishReason: string | null) =>
       JSON.stringify({
         choices: [
           {
@@ -95,8 +95,7 @@ async function raycastai(options: FetchSSEOptions) {
             finish_reason: finishReason,
           },
         ],
-      })
-    )
+      });
 
     onMessage(msgCreator(null));
     setTimeout(() => {
@@ -108,15 +107,5 @@ async function raycastai(options: FetchSSEOptions) {
     } else {
       onError({ error });
     }
-  }
-}
-
-export async function fetchSSE(input: string, options: FetchSSEOptions) {
-  const { headers } = options;
-  // The headers do not have key of Authorization if OpenAI apiKey is none
-  if (JSON.stringify(headers).includes("Authorization")) {
-    await openai(input, options);
-  } else {
-    await raycastai(options);
   }
 }
