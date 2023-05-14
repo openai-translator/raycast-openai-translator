@@ -8,11 +8,13 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 type ExtensionPreferences = {
-  /** OpenAI API Key - Enter your personal OpenAI API Key,  Type 'none' if your entrypoint do not require an API key or you are a Raycast PRO user. */
+  /** Provider - Choice API Provider */
+  "provider": "openai" | "raycast" | "azure" | "chatgpt",
+  /** API Key - Enter your API Key for your provider,  Type 'none' if your entrypoint do not require an API key */
   "apikey": string,
-  /** OpenAI API Entrypoint - Enter your custom OpenAI entrypoint. */
+  /** API Entrypoint - Enter your provider entrypoint, If your provider does not require an entrypoint, it will be ignored. */
   "entrypoint": string,
-  /** API Model - Choice API Model */
+  /** API Model - Choose an OpenAI API model, which is only available when using the OpenAI provider */
   "apiModel"?: "gpt-3.5-turbo" | "gpt-3.5-turbo-0301" | "gpt-4" | "gpt-4-0314" | "gpt-4-32k" | "gpt-4-32k-0314",
   /** Translate to - Choice First language */
   "toLang": "en" | "zh-Hans" | "zh-Hant" | "yue" | "wyw" | "ja" | "ko" | "fr" | "de" | "es" | "it" | "ru" | "pt" | "nl" | "pl" | "ar" | "af" | "am" | "az" | "be" | "bg" | "bn" | "bs" | "ca" | "ceb" | "co" | "cs" | "cy" | "da" | "el" | "eo" | "et" | "eu" | "fa" | "fi" | "fj" | "fy" | "ga" | "gd" | "gl" | "gu" | "ha" | "haw" | "he" | "hi" | "hmn" | "hr" | "ht" | "hu" | "hy" | "id" | "ig" | "is" | "jw" | "ka" | "kk",
