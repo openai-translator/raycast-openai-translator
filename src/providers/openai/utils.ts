@@ -78,6 +78,7 @@ export async function raycast(options: FetchSSEOptions) {
       .join("\n");
 
     const resp = await AI.ask(prompt, {
+      model: "gpt-3.5-turbo",
       creativity: "low",
       signal,
     });
