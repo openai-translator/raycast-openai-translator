@@ -1,8 +1,6 @@
 import { List } from "@raycast/api";
 import { supportLanguages } from "../providers/openai/lang";
 
-type DrinkType = { id: string; name: string };
-
 export function LangDropdown(props: {
   type: string;
   selectedStandardLang: string;
