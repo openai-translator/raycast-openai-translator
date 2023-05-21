@@ -93,6 +93,7 @@ export const ContentView = (props: ContentViewProps) => {
         error: message,
       },
       ocrImg: img,
+      provider,
     };
     history.add(record);
     setFinishReason(null);
@@ -117,6 +118,7 @@ export const ContentView = (props: ContentViewProps) => {
         text: newText,
       },
       ocrImg: img,
+      provider,
     };
     history.add(record);
     setFinishReason(null);
@@ -320,6 +322,7 @@ export const ContentView = (props: ContentViewProps) => {
                 mode={querying ? querying.query.mode : "translate"}
                 ocrImg={query.ocrImage}
                 to={query.to}
+                provider={provider}
               />
             }
           />
@@ -339,6 +342,7 @@ export const ContentView = (props: ContentViewProps) => {
                 mode={item.mode}
                 created_at={item.created_at}
                 ocrImg={item.ocrImg}
+                provider={item.provider}
               />
             }
           />
