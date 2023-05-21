@@ -9,7 +9,7 @@
 
 type ExtensionPreferences = {
   /** Provider - Choice API Provider */
-  "provider": "openai" | "raycast" | "azure",
+  "provider": "openai" | "raycast" | "azure" | "palm2",
   /** API Key - Enter your API Key for your provider,  Type 'none' if your entrypoint do not require an API key */
   "apikey": string,
   /** API Entrypoint - Enter your provider entrypoint, If your provider does not require an entrypoint, it will be ignored. */

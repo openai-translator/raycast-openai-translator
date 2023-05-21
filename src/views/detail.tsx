@@ -3,6 +3,12 @@ import capitalize from "capitalize";
 import { langMap } from "../providers/lang";
 import { TranslateMode } from "../providers/types";
 
+const PROVIDER_MAP =  {
+  "openai" : "OpenAI",
+  "raycast" : "Raycast AI",
+  "azure" : "Azure",
+  "palm2" : "PaLM 2"
+}
 export interface DetailViewProps {
   text: string;
   original: string;
@@ -11,10 +17,11 @@ export interface DetailViewProps {
   mode: TranslateMode;
   created_at?: string;
   ocrImg: string | undefined;
+  provider: string | undefined;
 }
 
 export const DetailView = (props: DetailViewProps) => {
-  const { text, original, from, to, mode, created_at, ocrImg } = props;
+  const { text, original, from, to, mode, created_at, ocrImg, provider } = props;
   const imgMd = ocrImg ? `\n![](${ocrImg})` : "";
   return (
     <List.Item.Detail
@@ -25,6 +32,7 @@ export const DetailView = (props: DetailViewProps) => {
           <Detail.Metadata.Label title="To" text={`${langMap.get(to)}`} />
           <Detail.Metadata.Label title="Mode" text={capitalize(mode)} />
           {created_at && <Detail.Metadata.Label title="Created At" text={`${created_at}`} />}
+          {provider && <Detail.Metadata.Label title="Provider" text={`${PROVIDER_MAP[provider]}`} />}
         </Detail.Metadata>
       }
     />
