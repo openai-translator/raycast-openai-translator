@@ -1,7 +1,7 @@
 import { Detail, List } from "@raycast/api";
-import { langMap } from "../providers/openai/lang";
-import { TranslateMode } from "../providers/openai/translate";
 import capitalize from "capitalize";
+import { langMap } from "../providers/lang";
+import { TranslateMode } from "../providers/types";
 
 export interface DetailViewProps {
   text: string;
