@@ -1,5 +1,6 @@
 import { List } from "@raycast/api";
-import { supportLanguages } from "../providers/openai/lang";
+import { supportLanguages } from "../providers/lang";
+
 
 export function LangDropdown(props: {
   type: string;

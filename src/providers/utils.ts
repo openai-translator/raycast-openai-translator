@@ -2,7 +2,7 @@ import { AI, environment } from "@raycast/api";
 import { createParser } from "eventsource-parser";
 import fetch, { RequestInit } from "node-fetch";
 
-interface FetchSSEOptions extends RequestInit {
+export interface FetchSSEOptions extends RequestInit {
   onMessage(data: string): void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onError(error: any): void;
@@ -46,62 +46,6 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         }
       }
     }
-  } catch (error) {
-    if (abortByTimeout) {
-      onError({ error: { message: "Connection Timeout" } });
-    } else {
-      onError({ error });
-    }
-  }
-}
-
-export async function raycast(options: FetchSSEOptions) {
-  const { onMessage, onError, signal: originSignal, body } = options;
-  const timeout = 15 * 1000;
-  let abortByTimeout = false;
-  try {
-    if (!environment.canAccess(AI)) {
-      throw new Error("You do not have access to RaycastAI.");
-    }
-    const ctrl = new AbortController();
-    const { signal } = ctrl;
-    if (originSignal) {
-      originSignal.addEventListener("abort", () => ctrl.abort());
-    }
-    const timerId = setTimeout(() => {
-      abortByTimeout = true;
-      ctrl.abort();
-    }, timeout);
-
-    const prompt = JSON.parse(body)
-      .messages.map((item: { role: string; content: string }) => item.content)
-      .join("\n");
-
-    const resp = await AI.ask(prompt, {
-      model: "gpt-3.5-turbo",
-      creativity: "low",
-      signal,
-    });
-
-    clearTimeout(timerId);
-
-    const msgCreator = (finishReason: string | null) =>
-      JSON.stringify({
-        choices: [
-          {
-            delta: {
-              content: resp.replaceAll("\n", "\n\n"),
-            },
-            index: 0,
-            finish_reason: finishReason,
-          },
-        ],
-      });
-
-    onMessage(msgCreator(null));
-    setTimeout(() => {
-      onMessage(msgCreator("stop"));
-    }, 10);
   } catch (error) {
     if (abortByTimeout) {
       onError({ error: { message: "Connection Timeout" } });

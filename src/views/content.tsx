@@ -1,16 +1,17 @@
 import { Action, ActionPanel, confirmAlert, getPreferenceValues, Icon, List, showToast, Toast } from "@raycast/api";
 import { DetailView } from "./detail";
 import { EmptyView } from "./empty";
-import { translate, TranslateMode, TranslateQuery } from "../providers/openai/translate";
 import { QueryHook } from "../hooks/useQuery";
 import { useProxy } from "../hooks/useProxy";
 import { Record, HistoryHook } from "../hooks/useHistory";
 import { useEffect, useState } from "react";
-import { detectLang } from "../providers/openai/lang";
 import { v4 as uuidv4 } from "uuid";
 import capitalize from "capitalize";
 import { getLoadActionSection } from "../actions/load";
 import { getModeActionSection } from "../actions/mode";
+import { TranslateMode, TranslateQuery } from "../providers/types";
+import { detectLang } from "../providers/lang";
+import { translate } from "../providers";
 
 export interface ContentViewProps {
   query: QueryHook;
