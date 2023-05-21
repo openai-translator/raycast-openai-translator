@@ -227,6 +227,10 @@
         {
           "value": "azure",
           "title": "Azure"
+        },
+        {
+          "value": "palm2",
+          "title": "PaLM 2"
         }
       ]
     },
@@ -595,9 +599,11 @@
     }
   ],
   "dependencies": {
+    "@google-ai/generativelanguage": "^0.2.0",
     "@raycast/api": "^1.51.1",
     "capitalize": "^2.0.4",
     "eventsource-parser": "^0.1.0",
+    "google-auth-library": "^8.8.0",
     "guesslanguage-ng": "^0.0.2",
     "iso-639-1": "^2.1.15",
     "iso-639-3-to-1": "^1.0.0",
