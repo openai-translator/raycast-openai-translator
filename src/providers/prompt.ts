@@ -1,34 +1,6 @@
-/* eslint-disable camelcase */
-import * as lang from "./lang";
-import {
-  fetchSSE,
-  raycast,
-} from "./utils";
-import { SocksProxyAgent } from "socks-proxy-agent";
 import { v4 as uuidv4 } from "uuid";
-
-
-export type TranslateMode = "translate" | "polishing" | "summarize" | "what";
-
-export interface TranslateQuery {
-  text: string;
-  detectFrom: string;
-  detectTo: string;
-  mode: TranslateMode;
-  onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void;
-  onError: (error: string) => void;
-  onFinish: (reason: string) => void;
-  signal: AbortSignal;
-  agent?: SocksProxyAgent;
-}
-
-export interface TranslateResult {
-  original: string;
-  text: string;
-  from: string;
-  to: string;
-  error?: string;
-}
+import { TranslateQuery } from "./types";
+import * as lang from "./lang";
 
 const isAWord = (lang: string, text: string) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -167,16 +139,18 @@ export class QuoteProcessor {
   }
 }
 
+export type Prompt = {
+  rolePrompt: string,
+  assistantPrompts: string[],
+  commandPrompt: string,
+  contentPrompt: string,
+  isWordMode: boolean,
+  quoteProcessor: QuoteProcessor | undefined
+}
+
 const chineseLangCodes = ["zh-TW", "zh-Hans", "zh-Hant", "wyw", "yue", "jdbhw", "xdbhw"];
 
-export async function translate(
-  query: TranslateQuery,
-  entrypoint: string,
-  apiKey: string,
-  model: string,
-  provider: string
-) {
-  console.log("call translate");
+export function generatePrompt(query: TranslateQuery): Prompt{
   const sourceLangCode = query.detectFrom;
   const targetLangCode = query.detectTo;
   const sourceLang = lang.getLangName(sourceLangCode);
@@ -245,145 +219,12 @@ export async function translate(
       break;
   }
 
-  let body: Record<string, any> = {
-    model,
-    temperature: 0,
-    max_tokens: 1000,
-    top_p: 1,
-    frequency_penalty: 1,
-    presence_penalty: 1,
-    stream: true,
-  };
-
-  const isFirst = true;
-
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  let isChatAPI = true;
-  if (provider === "azure" && entrypoint.indexOf("/chat/completions") < 0) {
-    // Azure OpenAI Service supports multiple API.
-    // We should check if the settings.apiURLPath is match `/deployments/{deployment-id}/chat/completions`.
-    // If not, we should use the legacy parameters.
-    isChatAPI = false;
-    body[
-      "prompt"
-    ] = `<|im_start|>system\n${rolePrompt}\n<|im_end|>\n<|im_start|>user\n${commandPrompt}\n${contentPrompt}\n<|im_end|>\n<|im_start|>assistant\n`;
-    body["stop"] = ["<|im_end|>"];
-  } else {
-    const messages = [
-      {
-        role: "system",
-        content: rolePrompt,
-      },
-      ...assistantPrompts.map((prompt) => {
-        return {
-          role: "user",
-          content: prompt,
-        };
-      }),
-      {
-        role: "user",
-        content: commandPrompt,
-      },
-      {
-        role: "user",
-        content: contentPrompt,
-      },
-    ];
-    body["messages"] = messages;
-  }
-  switch (provider) {
-    case "openai":
-      if (apiKey != "none") {
-        headers["Authorization"] = `Bearer ${apiKey}`;
-      }
-      break;
-    case "azure":
-      headers["api-key"] = `${apiKey}`;
-      break;
-  }
-  const options = {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-    signal: query.signal,
-    agent: query.agent,
-    onMessage: (msg) => {
-      let resp;
-      try {
-        resp = JSON.parse(msg);
-        // eslint-disable-next-line no-empty
-      } catch (error) {
-        query.onFinish("stop");
-        return;
-      }
-
-      const { choices } = resp;
-      if (!choices || choices.length === 0) {
-        return { error: "No result" };
-      }
-      const { finish_reason: finishReason } = choices[0];
-      if (finishReason) {
-        query.onFinish(finishReason);
-        return;
-      }
-
-      let targetTxt = "";
-      if (!isChatAPI) {
-        // It's used for Azure OpenAI Service's legacy parameters.
-        targetTxt = choices[0].text;
-        if (quoteProcessor) {
-          targetTxt = quoteProcessor.processText(targetTxt);
-        }
-
-        query.onMessage({ content: targetTxt, role: "", isWordMode });
-      } else {
-        const { content = "", role } = choices[0].delta;
-
-        targetTxt = content;
-
-        if (quoteProcessor) {
-          targetTxt = quoteProcessor.processText(targetTxt);
-        }
-
-        query.onMessage({ content: targetTxt, role, isWordMode });
-      }
-    },
-    onError: (err) => {
-      if (err instanceof Error) {
-        query.onError(err.message);
-        return;
-      }
-      if (typeof err === "string") {
-        query.onError(err);
-        return;
-      }
-      if (typeof err === "object") {
-        const { detail } = err;
-        if (detail) {
-          query.onError(detail);
-          return;
-        }
-      }
-      const { error } = err;
-      if (error instanceof Error) {
-        query.onError(error.message);
-        return;
-      }
-      if (typeof error === "object") {
-        const { message } = error;
-        if (message) {
-          query.onError(message);
-          return;
-        }
-      }
-    },
-  };
-  if (provider == "raycast") {
-    await raycast(options);
-  } else {
-    await fetchSSE(`${entrypoint}`, options);
+  return {
+    rolePrompt,
+    assistantPrompts,
+    commandPrompt,
+    contentPrompt,
+    isWordMode,
+    quoteProcessor,
   }
 }
