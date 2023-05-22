@@ -142,13 +142,18 @@ export const ContentView = (props: ContentViewProps) => {
   async function doQuery() {
     const controller = new AbortController();
     const { signal } = controller;
-    const detectFrom: string = query.from == "auto" ? (await detectLang(query.text)) ?? "en" : query.from;
     const toast = await showToast({
       title: "Getting your translation...",
       style: Toast.Style.Animated,
     });
+
     const text = query.text;
-    const detectTo = query.to;
+    const detectFrom: string = query.from == "auto" ? (await detectLang(query.text)) ?? "en" : query.from;
+
+    // 检测语言为中文且目标语言为中文时，自动翻译为英文
+    const detectTo = (mode == "translate" && detectFrom == query.to
+      && (query.to == "zh-Hans" || query.to == "zh-Hans")) ? "en" : query.to
+
     const img = query.ocrImage;
 
     const _querying: Querying = {
