@@ -1,25 +1,17 @@
-import { TranslateQuery } from "./types";
-import { Prompt, promptBuilders, generatMetadata } from "./prompt";
 import { getPreferenceValues } from "@raycast/api";
+import { Provider } from "./base";
 
-export abstract class Provider {
-  protected generatePrompt(query: TranslateQuery): Prompt{
-    const meta = generatMetadata(query)
-    const prompt  = {
-      rolePrompt: "You are a professional translation engine, please translate the text into a colloquial, professional, elegant and fluent content, without the style of machine translation. You must only translate the text content, never interpret it.",
-      commandPrompt: `Translate from ${meta.sourceLang} to ${meta.targetLang}. Only the translated text can be returned.`,
-      contentPrompt : query.text,
-      assistantPrompts: [],
-      quoteProcessor: undefined,
-      meta
-    }
-    return promptBuilders[query.mode](prompt)
-  }
-  protected abstract doTranslate(query: TranslateQuery, prompt: Prompt): Promise<void>
+//XXX raycast doesn't support dynamic import
+import openai from "./openai";
+import raycast from "./raycast";
+import azure from "./azure";
+import palm2 from "./palm2";
 
-  async translate(query: TranslateQuery) {
-    this.doTranslate(query, this.generatePrompt(query))
-  }
+const PROVIDER_CLASSES : Record<string, new (...args: any[]) => Provider> = {
+  "openai": openai,
+  "raycast": raycast,
+  "azure": azure,
+  "palm2": palm2
 }
 
 const record: Record<string, Provider> = {}
@@ -30,7 +22,7 @@ export function getProvider(provider: string): Provider {
     apikey: string;
     apiModel: string;
     }>()
-    const providerClass = require(`./${provider}`)
+    const providerClass = PROVIDER_CLASSES[provider]
     record[provider] = new providerClass(preferences);
   }
   return record[provider];
