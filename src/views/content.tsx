@@ -42,6 +42,15 @@ type FinishReason = {
   img: string | undefined;
 };
 
+const { provider:providerName } = getPreferenceValues<{
+    entrypoint: string;
+    apikey: string;
+    apiModel: string;
+    provider: string;
+  }>();
+
+const provider = getProvider(providerName)
+
 export const ContentView = (props: ContentViewProps) => {
   const { query, history, mode, setMode, setSelectedId, setIsInit, setIsEmpty } = props;
   const agent = useProxy();
@@ -49,14 +58,6 @@ export const ContentView = (props: ContentViewProps) => {
   const [querying, setQuerying] = useState<Querying | null>();
   const [finishReason, setFinishReason] = useState<FinishReason | null>();
   const [translatedText, setTranslatedText] = useState("");
-  const { entrypoint, apikey, apiModel, provider:providerName } = getPreferenceValues<{
-    entrypoint: string;
-    apikey: string;
-    apiModel: string;
-    provider: string;
-  }>();
-
-  const provider = getProvider(providerName)
 
   function updateData() {
     if (history.data) {
@@ -200,7 +201,7 @@ export const ContentView = (props: ContentViewProps) => {
     setTranslatedText("");
     setQuerying(_querying);
     query.updateText("");
-    translate(_querying.query, entrypoint, apikey, apiModel, provider);
+    provider.translate(_querying.query);
   }
 
   useEffect(() => {

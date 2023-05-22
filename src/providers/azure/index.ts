@@ -6,18 +6,21 @@ import { fetchSSE } from "../utils";
 
 export default class extends OpenAIProvider{
   private isChatAPI: boolean
-  constructor({entrypoint, apiKey}:{entrypoint: string, apiKey: string}) {
-    super({model:"", entrypoint, apiKey})
+  constructor({entrypoint, apikey}:{entrypoint: string, apikey: string}) {
+    super({apiModel:"", entrypoint, apikey})
     // Azure OpenAI Service supports multiple API.
     // We should check if the settings.apiURLPath is match `/deployments/{deployment-id}/chat/completions`.
     // If not, we should use the legacy parameters.
-    this.isChatAPI = entrypoint.indexOf("/chat/completions") < 0
+    console.log(entrypoint)
+    console.log(apikey)
+    this.isChatAPI = entrypoint.indexOf("/chat/completions") >= 0
+    console.log(this.isChatAPI)
   }
 
   headers(query: TranslateQuery,  prompt: Prompt): Record<string, string>{
     return {
       "Content-Type": "application/json",
-      "api-key": this.apiKey
+      "api-key": this.apikey
     }
   }
 
@@ -37,9 +40,7 @@ export default class extends OpenAIProvider{
       stream: true,
     };
 
-    let isChatAPI = true;
-
-    if (isChatAPI) {
+    if (!this.isChatAPI) {
       body[
       "prompt"
       ] = `<|im_start|>system\n${rolePrompt}\n<|im_end|>\n<|im_start|>user\n${commandPrompt}\n${contentPrompt}\n<|im_end|>\n<|im_start|>assistant\n`;
@@ -75,7 +76,7 @@ export default class extends OpenAIProvider{
       }
 
       let targetTxt = "";
-      if (!isChatAPI) {
+      if (!this.isChatAPI) {
         // It's used for Azure OpenAI Service's legacy parameters.
         targetTxt = choices[0].text;
         if (quoteProcessor) {
