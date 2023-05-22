@@ -79,6 +79,10 @@ export const supportLanguages: [string, string][] = [
 export const langMap: Map<string, string> = new Map(supportLanguages);
 export const langMapReverse = new Map(supportLanguages.map(([standardLang, lang]) => [lang, standardLang]));
 
+const chineseLangCodes = ["zh-TW", "zh-Hans", "zh-Hant", "wyw", "yue", "jdbhw", "xdbhw"];
+
+export const isChineseLangCode = (langCode: string) => chineseLangCodes.indexOf(langCode) >= 0;
+
 export async function detectLang(text: string): Promise<string | null> {
   const lang = await _detectLang(text);
   if (lang === "zh" || lang === "zh-CN" || lang === "zh-TW") {
@@ -86,6 +90,7 @@ export async function detectLang(text: string): Promise<string | null> {
   }
   return lang;
 }
+
 
 export function getLangName(langCode: string): string {
   switch (langCode) {
