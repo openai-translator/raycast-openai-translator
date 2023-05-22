@@ -11,7 +11,7 @@ import { getLoadActionSection } from "../actions/load";
 import { getModeActionSection } from "../actions/mode";
 import { TranslateMode, TranslateQuery } from "../providers/types";
 import { detectLang } from "../providers/lang";
-import { translate } from "../providers";
+import { getProvider } from "../providers";
 
 export interface ContentViewProps {
   query: QueryHook;
@@ -49,12 +49,14 @@ export const ContentView = (props: ContentViewProps) => {
   const [querying, setQuerying] = useState<Querying | null>();
   const [finishReason, setFinishReason] = useState<FinishReason | null>();
   const [translatedText, setTranslatedText] = useState("");
-  const { entrypoint, apikey, apiModel, provider } = getPreferenceValues<{
+  const { entrypoint, apikey, apiModel, provider:providerName } = getPreferenceValues<{
     entrypoint: string;
     apikey: string;
     apiModel: string;
     provider: string;
   }>();
+
+  const provider = getProvider(providerName)
 
   function updateData() {
     if (history.data) {
@@ -322,7 +324,7 @@ export const ContentView = (props: ContentViewProps) => {
                 mode={querying ? querying.query.mode : "translate"}
                 ocrImg={query.ocrImage}
                 to={query.to}
-                provider={provider}
+                provider={providerName}
               />
             }
           />

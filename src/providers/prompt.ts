@@ -1,6 +1,27 @@
 import { v4 as uuidv4 } from "uuid";
-import { TranslateQuery } from "./types";
+import { TranslateQuery, TranslateMode } from "./types";
 import * as lang from "./lang";
+
+export type Prompt = {
+  rolePrompt: string,
+  assistantPrompts: string[],
+  commandPrompt: string,
+  contentPrompt: string,
+  quoteProcessor: QuoteProcessor | undefined,
+  readonly meta: PromptMetadata
+}
+
+export type PromptMetadata = {
+  content: string,
+  sourceLangCode: string,
+  targetLangCode: string,
+  sourceLang: string;
+  targetLang: string,
+  toChinese: boolean
+  isWordMode: boolean,
+}
+
+export type PromptBuilder = (prompt: Prompt) => Prompt
 
 const isAWord = (lang: string, text: string) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -139,46 +160,69 @@ export class QuoteProcessor {
   }
 }
 
-export type Prompt = {
-  rolePrompt: string,
-  assistantPrompts: string[],
-  commandPrompt: string,
-  contentPrompt: string,
-  isWordMode: boolean,
-  quoteProcessor: QuoteProcessor | undefined
-}
 
-const chineseLangCodes = ["zh-TW", "zh-Hans", "zh-Hant", "wyw", "yue", "jdbhw", "xdbhw"];
 
-export function generatePrompt(query: TranslateQuery): Prompt{
+export function generatMetadata(query: TranslateQuery): PromptMetadata{
   const sourceLangCode = query.detectFrom;
   const targetLangCode = query.detectTo;
   const sourceLang = lang.getLangName(sourceLangCode);
   const targetLang = lang.getLangName(targetLangCode);
   console.debug("sourceLang", sourceLang);
   console.debug("targetLang", targetLang);
-  let quoteProcessor: QuoteProcessor | undefined;
-  const toChinese = chineseLangCodes.indexOf(targetLangCode) >= 0;
-  let rolePrompt =
-    "You are a professional translation engine, please translate the text into a colloquial, professional, elegant and fluent content, without the style of machine translation. You must only translate the text content, never interpret it.";
-  const assistantPrompts: string[] = [];
-  let commandPrompt = `Translate from ${sourceLang} to ${targetLang}. Only the translated text can be returned.`;
-  let contentPrompt = query.text;
+  const toChinese = lang.isChineseLangCode(targetLangCode);
+  const isWordMode = toChinese && isAWord(sourceLangCode, query.text.trim());
 
-  // a word could be collected
-  let isWordMode = false;
-  switch (query.mode) {
-    case "translate":
-      quoteProcessor = new QuoteProcessor();
+  return {
+    content: query.text,
+    sourceLangCode,
+    targetLangCode,
+    sourceLang,
+    targetLang,
+    isWordMode,
+    toChinese,
+  }
+}
+
+export const promptBuilders: Record<TranslateMode, PromptBuilder> = {
+
+  // Translate
+  ["translate"]: (prompt: Prompt) => {
+    let {
+      rolePrompt,
+      commandPrompt,
+      contentPrompt,
+      quoteProcessor = new QuoteProcessor(),
+      meta: query
+    } = prompt
+    const {
+      content,
+      isWordMode,
+      targetLangCode,
+      targetLang,
+      toChinese
+    } = query
+    if (isWordMode) {
+      // 翻译为中文时，增加单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
+      rolePrompt = `你是一个翻译引擎，请将翻译给到的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、对应的音标（如果有）、所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
+                <单词>
+                [<语种>] · / <单词音标>
+                [<词性缩写>] <中文含义>]
+                例句：
+                <序号><例句>(例句翻译)`;
+      commandPrompt = "好的，我明白了，请给我这个单词。";
+      contentPrompt = `单词是：${content}`;
+      return { ...prompt,rolePrompt,commandPrompt, contentPrompt}
+
+    } else {
       commandPrompt += ` Only translate the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`;
-      contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd} =>`;
+      contentPrompt = `${quoteProcessor.quoteStart}${content}${quoteProcessor.quoteEnd} =>`;
       if (targetLangCode === "xdbhw") {
         rolePrompt = "您是一位在中文系研究中文的资深学者";
         commandPrompt = `夹在${quoteProcessor.quoteStart}和${quoteProcessor.quoteEnd}之间的内容是原文，请您将原文内容翻译成《呐喊》风格的现代白话文`;
       } else if (targetLangCode === "jdbhw") {
         rolePrompt = "您是一位在中文系研究中文的资深学者";
         commandPrompt = `夹在${quoteProcessor.quoteStart}和${quoteProcessor.quoteEnd}之间的内容是原文，请您将原文内容翻译成《红楼梦》风格的近代白话文`;
-      } else if (query.text.length < 5 && toChinese) {
+      } else if (content.length < 5 && toChinese) {
         // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
         rolePrompt = `你是一个翻译引擎，请将给到的文本翻译成${targetLang}。请列出3种（如果有）最常用翻译结果：单词或短语，并列出对应的适用语境（用中文阐述）、音标、词性、双语示例。按照下面格式用中文阐述：
                     <序号><单词或短语> · /<音标>
@@ -186,45 +230,30 @@ export function generatePrompt(query: TranslateQuery): Prompt{
                     例句：<例句>(例句翻译)`;
         commandPrompt = "";
       }
-      if (toChinese && isAWord(sourceLangCode, query.text.trim())) {
-        isWordMode = true;
-        // 翻译为中文时，增加单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
-        rolePrompt = `你是一个翻译引擎，请将翻译给到的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、对应的音标（如果有）、所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
-                <单词>
-                [<语种>] · / <单词音标>
-                [<词性缩写>] <中文含义>]
-                例句：
-                <序号><例句>(例句翻译)`;
-        commandPrompt = "好的，我明白了，请给我这个单词。";
-        contentPrompt = `单词是：${query.text}`;
-      }
-      break;
-    case "polishing":
-      rolePrompt =
-        "You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.";
-      commandPrompt = `polish this text in ${sourceLang}`;
-      break;
-    case "summarize":
-      rolePrompt = "You are a professional text summarizer, you can only summarize the text, don't interpret it.";
-      commandPrompt = `summarize this text in the most concise language and must use ${targetLang} language!`;
-      break;
-    case "what":
-      rolePrompt = "You are a identifier, you can only response on markdown format.";
-      if (toChinese) {
-        commandPrompt = `请按照 markdown 的格式回答，Section有Maybe和Desc，Maybe回答他最可能是的东西（要求精确些），Desc回答这个东西的描述;
-            答案应该使用中文。`;
-      } else {
-        commandPrompt = `Please answer in markdown format with two section 'Maybe' and 'Desc'. 'Maybe' should provide the most likely thing it is (be more precise), while 'Desc' should describe what this thing is. And you answer must be ${targetLang}.`;
-      }
-      break;
-  }
+    }
+    return { ...prompt,  rolePrompt,  commandPrompt,  contentPrompt, quoteProcessor}
+  },
 
-  return {
-    rolePrompt,
-    assistantPrompts,
-    commandPrompt,
-    contentPrompt,
-    isWordMode,
-    quoteProcessor,
+  // Polishing
+  ["polishing"]: (prompt: Prompt) => {
+    const rolePrompt =
+      "You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.";
+    const commandPrompt = `polish this text in ${prompt.meta.sourceLang}`;
+    return { ...prompt,  rolePrompt,  commandPrompt}
+  },
+
+  // Summarize
+  ["summarize"]: (prompt: Prompt) => {
+    const rolePrompt = "You are a professional text summarizer, you can only summarize the text, don't interpret it.";
+    const commandPrompt = `summarize this text in the most concise language and must use ${prompt.meta.targetLang} language!`;
+    return { ...prompt,  rolePrompt,  commandPrompt}
+  },
+
+  // What
+  ["what"]: (prompt: Prompt) =>  {
+    const rolePrompt = "You are a identifier, you can only response on markdown format.";
+    const commandPrompt = prompt.meta.toChinese ? `请按照 markdown 的格式回答，Section有Maybe和Desc，Maybe回答他最可能是的东西（要求精确些），Desc回答这个东西的描述; 答案应该使用中文。`
+      : `Please answer in markdown format with two section 'Maybe' and 'Desc'. 'Maybe' should provide the most likely thing it is (be more precise), while 'Desc' should describe what this thing is. And you answer must be ${prompt.meta.targetLang}.`
+     return { ...prompt,  rolePrompt,  commandPrompt}
   }
 }

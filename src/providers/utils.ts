@@ -54,3 +54,30 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
     }
   }
 }
+
+
+export function getErrorText(err: any): string{
+  if (err instanceof Error) {
+    return err.message;
+  }
+  if (typeof err === "string") {
+    return err;
+  }
+  if (typeof err === "object") {
+    const { detail } = err;
+    if (detail) {
+      return detail;
+    }
+  }
+  const { error } = err;
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === "object") {
+    const { message } = error;
+    if (message) {
+      return message;
+    }
+  }
+  return "Unexcept error"
+}
