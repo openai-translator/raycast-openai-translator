@@ -96,7 +96,7 @@ export const ContentView = (props: ContentViewProps) => {
         error: message,
       },
       ocrImg: img,
-      provider,
+      provider: providerName,
     };
     history.add(record);
     setFinishReason(null);
@@ -121,7 +121,7 @@ export const ContentView = (props: ContentViewProps) => {
         text: newText,
       },
       ocrImg: img,
-      provider,
+      provider: providerName,
     };
     history.add(record);
     setFinishReason(null);
