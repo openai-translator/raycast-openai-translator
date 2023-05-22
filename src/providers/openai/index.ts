@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { Provider } from "..";
+import { Provider } from "../base";
 import { Prompt } from "../prompt";
 import { TranslateQuery } from "../types";
 import {
@@ -11,28 +11,28 @@ import {
 export default class extends Provider{
   protected model: string;
   protected entrypoint: string;
-  protected apiKey: string; //
+  protected apikey: string; //
 
-  constructor({model, entrypoint, apiKey}: {model: string, entrypoint: string, apiKey: string}) {
+  constructor({apiModel, entrypoint, apikey}: {apiModel: string, entrypoint: string, apikey: string}) {
     super()
-    this.model = model
+    this.model = apiModel
     this.entrypoint = entrypoint
-    this.apiKey = apiKey
+    this.apikey = apikey
   }
-
 
   async doTranslate(query: TranslateQuery, prompt: Prompt): Promise<void>{
     const body = this.body(query, prompt)
     const messages = this.messages(query, prompt);
     const headers = this.headers(query, prompt)
-    const onMessage =  this.handleMessage(query, prompt),
+    const onMessage =  this.handleMessage(query, prompt);
 
     const isFirst = true;
-    body["messages"] = messages
+
+    body["messages"] = messages;
 
     const options = {
       ...this.options(query, prompt),
-      body,
+      body: JSON.stringify(body),
       headers,
       onMessage
     }
@@ -44,8 +44,8 @@ export default class extends Provider{
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     }
-    if (this.apiKey != "none") {
-      headers["Authorization"] = `Bearer ${this.apiKey}`;
+    if (this.apikey != "none") {
+      headers["Authorization"] = `Bearer ${this.apikey}`;
     }
     return headers
   }
@@ -89,7 +89,7 @@ export default class extends Provider{
         role: "user",
         content: contentPrompt,
       },
-    ]
+    ];
   }
 
   handleMessage(query: TranslateQuery,  prompt: Prompt): (msg:string) => void{

@@ -1,5 +1,5 @@
 import { AI, environment } from "@raycast/api";
-import { Provider } from "..";
+import { Provider } from "../base";
 import { Prompt } from "../prompt";
 import { TranslateQuery } from "../types";
 import { getErrorText } from "../utils";
