@@ -3,12 +3,14 @@ import capitalize from "capitalize";
 import { langMap } from "../providers/lang";
 import { TranslateMode } from "../providers/types";
 
-const PROVIDER_MAP =  {
-  "openai" : "OpenAI",
-  "raycast" : "Raycast AI",
-  "azure" : "Azure",
-  "palm2" : "PaLM 2"
-}
+const PROVIDER_LABEL: Record<string, string> = {
+  openai: "OpenAI",
+  raycast: "Raycast AI",
+  azure: "Azure",
+  palm2: "PaLM 2",
+};
+
+
 export interface DetailViewProps {
   text: string;
   original: string;
@@ -32,7 +34,7 @@ export const DetailView = (props: DetailViewProps) => {
           <Detail.Metadata.Label title="To" text={`${langMap.get(to)}`} />
           <Detail.Metadata.Label title="Mode" text={capitalize(mode)} />
           {created_at && <Detail.Metadata.Label title="Created At" text={`${created_at}`} />}
-          {provider && <Detail.Metadata.Label title="Provider" text={`${PROVIDER_MAP[provider]}`} />}
+          {provider && <Detail.Metadata.Label title="Provider" text={`${PROVIDER_LABEL[provider]}`} />}
         </Detail.Metadata>
       }
     />

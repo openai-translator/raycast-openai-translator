@@ -3,25 +3,25 @@ import { TranslateQuery, TranslateMode } from "./types";
 import * as lang from "./lang";
 
 export type Prompt = {
-  rolePrompt: string,
-  assistantPrompts: string[],
-  commandPrompt: string,
-  contentPrompt: string,
-  quoteProcessor: QuoteProcessor | undefined,
-  readonly meta: PromptMetadata
-}
+  rolePrompt: string;
+  assistantPrompts: string[];
+  commandPrompt: string;
+  contentPrompt: string;
+  quoteProcessor: QuoteProcessor | undefined;
+  readonly meta: PromptMetadata;
+};
 
 export type PromptMetadata = {
-  content: string,
-  sourceLangCode: string,
-  targetLangCode: string,
+  content: string;
+  sourceLangCode: string;
+  targetLangCode: string;
   sourceLang: string;
-  targetLang: string,
-  toChinese: boolean
-  isWordMode: boolean,
-}
+  targetLang: string;
+  toChinese: boolean;
+  isWordMode: boolean;
+};
 
-export type PromptBuilder = (prompt: Prompt) => Prompt
+export type PromptBuilder = (prompt: Prompt) => Prompt;
 
 const isAWord = (lang: string, text: string) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -160,9 +160,7 @@ export class QuoteProcessor {
   }
 }
 
-
-
-export function generatMetadata(query: TranslateQuery): PromptMetadata{
+export function generatMetadata(query: TranslateQuery): PromptMetadata {
   const sourceLangCode = query.detectFrom;
   const targetLangCode = query.detectTo;
   const sourceLang = lang.getLangName(sourceLangCode);
@@ -180,27 +178,15 @@ export function generatMetadata(query: TranslateQuery): PromptMetadata{
     targetLang,
     isWordMode,
     toChinese,
-  }
+  };
 }
 
 export const promptBuilders: Record<TranslateMode, PromptBuilder> = {
-
   // Translate
   ["translate"]: (prompt: Prompt) => {
-    let {
-      rolePrompt,
-      commandPrompt,
-      contentPrompt,
-      quoteProcessor = new QuoteProcessor(),
-      meta: query
-    } = prompt
-    const {
-      content,
-      isWordMode,
-      targetLangCode,
-      targetLang,
-      toChinese
-    } = query
+    let { rolePrompt, commandPrompt, contentPrompt } = prompt;
+    const { quoteProcessor = new QuoteProcessor(), meta: query } = prompt;
+    const { content, isWordMode, targetLangCode, targetLang, toChinese } = query;
     if (isWordMode) {
       // 翻译为中文时，增加单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
       rolePrompt = `你是一个翻译引擎，请将翻译给到的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、对应的音标（如果有）、所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
@@ -211,8 +197,7 @@ export const promptBuilders: Record<TranslateMode, PromptBuilder> = {
                 <序号><例句>(例句翻译)`;
       commandPrompt = "好的，我明白了，请给我这个单词。";
       contentPrompt = `单词是：${content}`;
-      return { ...prompt,rolePrompt,commandPrompt, contentPrompt}
-
+      return { ...prompt, rolePrompt, commandPrompt, contentPrompt };
     } else {
       commandPrompt += ` Only translate the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`;
       contentPrompt = `${quoteProcessor.quoteStart}${content}${quoteProcessor.quoteEnd} =>`;
@@ -231,7 +216,7 @@ export const promptBuilders: Record<TranslateMode, PromptBuilder> = {
         commandPrompt = "";
       }
     }
-    return { ...prompt,  rolePrompt,  commandPrompt,  contentPrompt, quoteProcessor}
+    return { ...prompt, rolePrompt, commandPrompt, contentPrompt, quoteProcessor };
   },
 
   // Polishing
@@ -239,21 +224,22 @@ export const promptBuilders: Record<TranslateMode, PromptBuilder> = {
     const rolePrompt =
       "You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.";
     const commandPrompt = `polish this text in ${prompt.meta.sourceLang}`;
-    return { ...prompt,  rolePrompt,  commandPrompt}
+    return { ...prompt, rolePrompt, commandPrompt };
   },
 
   // Summarize
   ["summarize"]: (prompt: Prompt) => {
     const rolePrompt = "You are a professional text summarizer, you can only summarize the text, don't interpret it.";
     const commandPrompt = `summarize this text in the most concise language and must use ${prompt.meta.targetLang} language!`;
-    return { ...prompt,  rolePrompt,  commandPrompt}
+    return { ...prompt, rolePrompt, commandPrompt };
   },
 
   // What
-  ["what"]: (prompt: Prompt) =>  {
+  ["what"]: (prompt: Prompt) => {
     const rolePrompt = "You are a identifier, you can only response on markdown format.";
-    const commandPrompt = prompt.meta.toChinese ? `请按照 markdown 的格式回答，Section有Maybe和Desc，Maybe回答他最可能是的东西（要求精确些），Desc回答这个东西的描述; 答案应该使用中文。`
-      : `Please answer in markdown format with two section 'Maybe' and 'Desc'. 'Maybe' should provide the most likely thing it is (be more precise), while 'Desc' should describe what this thing is. And you answer must be ${prompt.meta.targetLang}.`
-     return { ...prompt,  rolePrompt,  commandPrompt}
-  }
-}
+    const commandPrompt = prompt.meta.toChinese
+      ? `请按照 markdown 的格式回答，Section有Maybe和Desc，Maybe回答他最可能是的东西（要求精确些），Desc回答这个东西的描述; 答案应该使用中文。`
+      : `Please answer in markdown format with two section 'Maybe' and 'Desc'. 'Maybe' should provide the most likely thing it is (be more precise), while 'Desc' should describe what this thing is. And you answer must be ${prompt.meta.targetLang}.`;
+    return { ...prompt, rolePrompt, commandPrompt };
+  },
+};

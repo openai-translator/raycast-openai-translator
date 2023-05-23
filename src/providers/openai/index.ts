@@ -1,30 +1,28 @@
 /* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Provider } from "../base";
 import { Prompt } from "../prompt";
 import { TranslateQuery } from "../types";
-import {
-  fetchSSE, getErrorText,
-} from "../utils";
+import { fetchSSE, getErrorText } from "../utils";
 
-
-
-export default class extends Provider{
+export default class extends Provider {
   protected model: string;
   protected entrypoint: string;
   protected apikey: string; //
 
-  constructor({apiModel, entrypoint, apikey}: {apiModel: string, entrypoint: string, apikey: string}) {
-    super()
-    this.model = apiModel
-    this.entrypoint = entrypoint
-    this.apikey = apikey
+  constructor({ apiModel, entrypoint, apikey }: { apiModel: string; entrypoint: string; apikey: string }) {
+    super();
+    this.model = apiModel;
+    this.entrypoint = entrypoint;
+    this.apikey = apikey;
   }
 
-  async doTranslate(query: TranslateQuery, prompt: Prompt): Promise<void>{
-    const body = this.body(query, prompt)
+  async doTranslate(query: TranslateQuery, prompt: Prompt): Promise<void> {
+    const body = this.body(query, prompt);
     const messages = this.messages(query, prompt);
-    const headers = this.headers(query, prompt)
-    const onMessage =  this.handleMessage(query, prompt);
+    const headers = this.headers(query, prompt);
+    const onMessage = this.handleMessage(query, prompt);
 
     const isFirst = true;
 
@@ -34,23 +32,22 @@ export default class extends Provider{
       ...this.options(query, prompt),
       body: JSON.stringify(body),
       headers,
-      onMessage
-    }
+      onMessage,
+    };
     await fetchSSE(`${this.entrypoint}`, options);
   }
 
-
-  headers(query: TranslateQuery,  prompt: Prompt): Record<string, string>{
+  headers(query: TranslateQuery, prompt: Prompt): Record<string, string> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-    }
+    };
     if (this.apikey != "none") {
       headers["Authorization"] = `Bearer ${this.apikey}`;
     }
-    return headers
+    return headers;
   }
 
-  body(query: TranslateQuery,  prompt: Prompt): Record<string, any> {
+  body(query: TranslateQuery, prompt: Prompt): Record<string, any> {
     return {
       model: this.model,
       temperature: 0,
@@ -62,13 +59,8 @@ export default class extends Provider{
     };
   }
 
-  messages(query: TranslateQuery,  prompt: Prompt): any {
-    const {
-      rolePrompt,
-      assistantPrompts,
-      commandPrompt,
-      contentPrompt
-    } = prompt
+  messages(query: TranslateQuery, prompt: Prompt): any {
+    const { rolePrompt, assistantPrompts, commandPrompt, contentPrompt } = prompt;
 
     return [
       {
@@ -92,13 +84,10 @@ export default class extends Provider{
     ];
   }
 
-  handleMessage(query: TranslateQuery,  prompt: Prompt): (msg:string) => void{
-    return (msg:string) => {
-      const {
-        quoteProcessor,
-        meta,
-      } = prompt
-      const { isWordMode } = meta
+  handleMessage(query: TranslateQuery, prompt: Prompt): (msg: string) => void {
+    return (msg: string) => {
+      const { quoteProcessor, meta } = prompt;
+      const { isWordMode } = meta;
 
       let resp;
       try {
@@ -128,7 +117,7 @@ export default class extends Provider{
         targetTxt = quoteProcessor.processText(targetTxt);
       }
       query.onMessage({ content: targetTxt, role, isWordMode });
-    }
+    };
   }
 
   options(query: TranslateQuery, prompt: Prompt) {
@@ -137,10 +126,8 @@ export default class extends Provider{
       signal: query.signal,
       agent: query.agent,
       onError: (err: any) => {
-        query.onError(getErrorText(err))
+        query.onError(getErrorText(err));
       },
     };
-
   }
-
 }

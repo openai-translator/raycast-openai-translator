@@ -75,13 +75,12 @@ const chineseLangCodes = ["zh-TW", "zh-Hans", "zh-Hant", "wyw", "yue", "jdbhw", 
 export const isChineseLangCode = (langCode: string) => chineseLangCodes.indexOf(langCode) >= 0;
 
 export async function detectLang(text: string): Promise<string | null> {
-  try{
+  try {
     return await detect(text);
-  }catch(error){
-    return null
+  } catch (error) {
+    return null;
   }
 }
-
 
 export function getLangName(langCode: string): string {
   switch (langCode) {
