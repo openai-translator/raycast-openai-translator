@@ -6,6 +6,7 @@
 - Azure OpenAI Service  support
 - PaLM 2 limited support
 - Using build-in NLLanguageRegcondizer for language detection
+- Auto exchange target and source when translate English and Chinese
 - Fixed incomplete display of translation
 
 
