@@ -1,4 +1,3 @@
-import { AI, environment } from "@raycast/api";
 import { createParser } from "eventsource-parser";
 import fetch, { RequestInit } from "node-fetch";
 
@@ -9,8 +8,6 @@ export interface FetchSSEOptions extends RequestInit {
 }
 
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
-  const proxy = "socks5://localhost:1080";
-
   const { onMessage, onError, signal: originSignal, ...fetchOptions } = options;
   const timeout = 15 * 1000;
   let abortByTimeout = false;
@@ -54,9 +51,8 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
     }
   }
 }
-
-
-export function getErrorText(err: any): string{
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export function getErrorText(err: any): string {
   if (err instanceof Error) {
     return err.message;
   }
@@ -79,5 +75,5 @@ export function getErrorText(err: any): string{
       return message;
     }
   }
-  return "Unexcept error"
+  return "Unexcept error";
 }

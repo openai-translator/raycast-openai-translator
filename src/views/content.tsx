@@ -42,14 +42,14 @@ type FinishReason = {
   img: string | undefined;
 };
 
-const { provider:providerName } = getPreferenceValues<{
-    entrypoint: string;
-    apikey: string;
-    apiModel: string;
-    provider: string;
-  }>();
+const { provider: providerName } = getPreferenceValues<{
+  entrypoint: string;
+  apikey: string;
+  apiModel: string;
+  provider: string;
+}>();
 
-const provider = getProvider(providerName)
+const provider = getProvider(providerName);
 
 export const ContentView = (props: ContentViewProps) => {
   const { query, history, mode, setMode, setSelectedId, setIsInit, setIsEmpty } = props;
@@ -151,8 +151,10 @@ export const ContentView = (props: ContentViewProps) => {
     const detectFrom: string = query.from == "auto" ? (await detectLang(query.text)) ?? "en" : query.from;
 
     // 检测语言为中文且目标语言为中文时，自动翻译为英文
-    const detectTo = (mode == "translate" && detectFrom == query.to
-      && (query.to == "zh-Hans" || query.to == "zh-Hans")) ? "en" : query.to
+    const detectTo =
+      mode == "translate" && detectFrom == query.to && (query.to == "zh-Hans" || query.to == "zh-Hans")
+        ? "en"
+        : query.to;
 
     const img = query.ocrImage;
 

@@ -1,36 +1,30 @@
-import  OpenAIProvider from "../openai";
+import OpenAIProvider from "../openai";
 import { Prompt } from "../prompt";
 import { TranslateQuery } from "../types";
-import { fetchSSE } from "../utils";
 
-
-export default class extends OpenAIProvider{
-  private isChatAPI: boolean
-  constructor({entrypoint, apikey}:{entrypoint: string, apikey: string}) {
-    super({apiModel:"", entrypoint, apikey})
+export default class extends OpenAIProvider {
+  private isChatAPI: boolean;
+  constructor({ entrypoint, apikey }: { entrypoint: string; apikey: string }) {
+    super({ apiModel: "", entrypoint, apikey });
     // Azure OpenAI Service supports multiple API.
     // We should check if the settings.apiURLPath is match `/deployments/{deployment-id}/chat/completions`.
     // If not, we should use the legacy parameters.
-    console.log(entrypoint)
-    console.log(apikey)
-    this.isChatAPI = entrypoint.indexOf("/chat/completions") >= 0
-    console.log(this.isChatAPI)
+    console.log(entrypoint);
+    console.log(apikey);
+    this.isChatAPI = entrypoint.indexOf("/chat/completions") >= 0;
+    console.log(this.isChatAPI);
   }
 
-  headers(query: TranslateQuery,  prompt: Prompt): Record<string, string>{
+  headers(query: TranslateQuery, prompt: Prompt): Record<string, string> {
     return {
       "Content-Type": "application/json",
-      "api-key": this.apikey
-    }
+      "api-key": this.apikey,
+    };
   }
 
-  body(query: TranslateQuery,  prompt: Prompt): Record<string, any> {
-    const {
-      rolePrompt,
-
-      commandPrompt,
-      contentPrompt
-    } = prompt
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  body(query: TranslateQuery, prompt: Prompt): Record<string, any> {
+    const { rolePrompt, commandPrompt, contentPrompt } = prompt;
     const body: Record<string, any> = {
       temperature: 0,
       max_tokens: 1000,
@@ -42,20 +36,17 @@ export default class extends OpenAIProvider{
 
     if (!this.isChatAPI) {
       body[
-      "prompt"
+        "prompt"
       ] = `<|im_start|>system\n${rolePrompt}\n<|im_end|>\n<|im_start|>user\n${commandPrompt}\n${contentPrompt}\n<|im_end|>\n<|im_start|>assistant\n`;
       body["stop"] = ["<|im_end|>"];
     }
-    return body
+    return body;
   }
 
-  handleMessage(query: TranslateQuery,  prompt: Prompt): (msg:string) => void{
-    return (msg:string) => {
-      const {
-        quoteProcessor,
-        meta,
-      } = prompt
-      const { isWordMode } = meta
+  handleMessage(query: TranslateQuery, prompt: Prompt): (msg: string) => void {
+    return (msg: string) => {
+      const { quoteProcessor, meta } = prompt;
+      const { isWordMode } = meta;
       let resp;
       try {
         resp = JSON.parse(msg);
@@ -95,6 +86,6 @@ export default class extends OpenAIProvider{
 
         query.onMessage({ content: targetTxt, role, isWordMode });
       }
-    }
+    };
   }
 }

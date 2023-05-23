@@ -1,44 +1,33 @@
-import { TextServiceClient, v1beta2 as generativeLanguage } from "@google-ai/generativelanguage";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+import { v1beta2 as generativeLanguage } from "@google-ai/generativelanguage";
 import { GoogleAuth } from "google-auth-library";
 import { Provider } from "../base";
 import { Prompt, PromptBuilder, QuoteProcessor } from "../prompt";
 import { TranslateMode, TranslateQuery } from "../types";
 import { getErrorText } from "../utils";
 
-
 const MODEL_NAME = "models/text-bison-001";
 
-export default class extends Provider{
-  private apikey: string
+export default class extends Provider {
+  private apikey: string;
 
-  constructor({apikey}: {apikey: string}) {
-    super()
-    this.apikey = apikey
+  constructor({ apikey }: { apikey: string }) {
+    super();
+    this.apikey = apikey;
   }
 
-  protected generatePrompt(query: TranslateQuery, builders: Record<TranslateMode, PromptBuilder>): Prompt{
+  protected generatePrompt(query: TranslateQuery, builders: Record<TranslateMode, PromptBuilder>): Prompt {
     builders["translate"] = (prompt: Prompt) => {
-      let {
-        rolePrompt,
-        commandPrompt,
-        contentPrompt,
-        quoteProcessor = new QuoteProcessor(),
-        meta: query
-      } = prompt
-      const {
-        content,
-        isWordMode,
-        targetLangCode,
-        targetLang,
-        toChinese
-      } = query
+      let { rolePrompt, commandPrompt, contentPrompt } = prompt;
+      const { quoteProcessor = new QuoteProcessor(), meta: query } = prompt;
+      const { content, isWordMode, targetLangCode, targetLang, toChinese } = query;
       if (isWordMode) {
         // 翻译为中文时，增加单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
         rolePrompt = `You are a translation engine. Please translate the provided word, please provide the word's original form, language, corresponding pronunciation (if available), all meanings (including parts of speech), and at least three bilingual example sentences. Please strictly follow the formatbelow for the translation results: "<Word>\\n[<Language>] · / <Word Pronunciation>\\n[<Part of Speech Abbreviation>] <Chinese Meaning>\\nExamples:\\n<Number>. <Example Sentence> (Translation of Example Sentence)"`;
         commandPrompt = "Sure, I got it. Please provide me with the word.";
         contentPrompt = `The word is: ${content}`;
-        return { ...prompt,rolePrompt,commandPrompt, contentPrompt}
-
+        return { ...prompt, rolePrompt, commandPrompt, contentPrompt };
       } else {
         commandPrompt += ` Only translate the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`;
         contentPrompt = `${quoteProcessor.quoteStart}${content}${quoteProcessor.quoteEnd} =>`;
@@ -57,71 +46,66 @@ export default class extends Provider{
           commandPrompt = "";
         }
       }
-      return { ...prompt,  rolePrompt,  commandPrompt,  contentPrompt, quoteProcessor}
-    }
-    return super.generatePrompt(query, builders)
+      return { ...prompt, rolePrompt, commandPrompt, contentPrompt, quoteProcessor };
+    };
+    return super.generatePrompt(query, builders);
   }
 
-
-  async doTranslate(query: TranslateQuery, prompt: Prompt){
+  async doTranslate(query: TranslateQuery, prompt: Prompt) {
     const client = new generativeLanguage.TextServiceClient({
       authClient: new GoogleAuth().fromAPIKey(this.apikey),
     });
-    const {
-      rolePrompt,
-      assistantPrompts,
-      commandPrompt,
-      contentPrompt,
-      quoteProcessor,
-      meta
-    } = prompt
+    const { rolePrompt, assistantPrompts, commandPrompt, contentPrompt, quoteProcessor, meta } = prompt;
 
-    const { isWordMode } = meta
+    const { isWordMode } = meta;
 
-    const text = `System: ${rolePrompt}\n${assistantPrompts.map((prompt) => "User: "+prompt).join("\n")}${ commandPrompt ? "Assistant: " + commandPrompt +"\n" : ""}User: ${contentPrompt}\nAssistant:`
+    const text = `System: ${rolePrompt}\n${assistantPrompts.map((prompt) => "User: " + prompt).join("\n")}${
+      commandPrompt ? "Assistant: " + commandPrompt + "\n" : ""
+    }User: ${contentPrompt}\nAssistant:`;
 
-    let abort = false //did we need lock?
+    let abort = false; //did we need lock?
     try {
-      query.signal.addEventListener("abort", ()=>{
-        if(!abort){
+      query.signal.addEventListener("abort", () => {
+        if (!abort) {
           abort = true;
           query.onError("Abort");
         }
-      })
+      });
 
       //FIXME google-gax didn't support AbortController try nice-grpc
-      const [resp, _] = await client.generateText({
-        model: MODEL_NAME,
-        stopSequences: quoteProcessor ? [quoteProcessor.quoteEnd] : null,
-        temperature: isWordMode ? 0.7 : 0,
-        prompt: {
-          text,
-        }},
-        {timeout: 15 * 1000}
-      )
+      const [resp, _] = await client.generateText(
+        {
+          model: MODEL_NAME,
+          stopSequences: quoteProcessor ? [quoteProcessor.quoteEnd] : null,
+          temperature: isWordMode ? 0.7 : 0,
+          prompt: {
+            text,
+          },
+        },
+        { timeout: 15 * 1000 }
+      );
 
-      if(resp.candidates && resp.candidates.length > 0){
-        const content = resp.candidates[0].output
+      if (resp.candidates && resp.candidates.length > 0) {
+        const content = resp.candidates[0].output;
         let targetTxt = content?.replaceAll("\n", "\n\n") ?? "";
         if (quoteProcessor) {
           targetTxt = quoteProcessor.processText(targetTxt);
         }
-        if(!abort){
+        if (!abort) {
           query.onMessage({ content: targetTxt, role: "", isWordMode });
           query.onFinish("stop");
         }
       } else {
-        if(resp.filters && resp.filters.length > 0){
-          query.onError(`filters: ${resp.filters.map(f => f.reason).join(", ")}`);
-        }else{
+        if (resp.filters && resp.filters.length > 0) {
+          query.onError(`filters: ${resp.filters.map((f) => f.reason).join(", ")}`);
+        } else {
           query.onError("Unexcept error");
         }
       }
     } catch (error) {
-      if(!abort){
-        query.onError(getErrorText(error))
+      if (!abort) {
+        query.onError(getErrorText(error));
       }
     }
-
   }
 }

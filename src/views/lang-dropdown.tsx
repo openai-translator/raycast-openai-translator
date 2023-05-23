@@ -1,7 +1,6 @@
 import { List } from "@raycast/api";
 import { supportLanguages } from "../providers/lang";
 
-
 export function LangDropdown(props: {
   type: string;
   selectedStandardLang: string;
