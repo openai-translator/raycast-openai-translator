@@ -604,14 +604,11 @@
     "capitalize": "^2.0.4",
     "eventsource-parser": "^0.1.0",
     "google-auth-library": "^8.8.0",
-    "guesslanguage-ng": "^0.0.2",
     "iso-639-1": "^2.1.15",
     "iso-639-3-to-1": "^1.0.0",
-    "languagedetect": "^2.0.0",
     "node-fetch": "^3.3.0",
     "socks-proxy-agent": "^7.0.0",
-    "uuid": "^9.0.0",
-    "xregexp": "^5.1.1"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/capitalize": "^2.0.0",
@@ -627,7 +624,7 @@
   },
   "scripts": {
     "build": "ray build -e dist",
-    "build-swift": "swift build --configuration=release --arch arm64 --arch x86_64 && mv .build/apple/Products/Release/ocr assets",
+    "build-swift": "swift build --configuration=release --arch arm64 --arch x86_64 && mv .build/apple/Products/Release/{ocr,lang} assets",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",

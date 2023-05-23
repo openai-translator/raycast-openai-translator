@@ -8,9 +8,9 @@ import {
   showHUD,
   updateCommandMetadata,
 } from "@raycast/api";
-import { spawn, spawnSync } from "child_process";
+import { spawnSync } from "child_process";
 import fs from "fs";
-import { TranslateMode } from "./providers/openai/translate";
+import { TranslateMode } from "./providers/types";
 
 async function fetchUnreadNotificationCount() {
   return 10;
