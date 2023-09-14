@@ -51,6 +51,10 @@ const { provider: providerName } = getPreferenceValues<{
 
 const provider = getProvider(providerName);
 
+const { alwayShowMetadata } = getPreferenceValues<{
+    alwayShowMetadata: boolean;
+  }>();
+
 export const ContentView = (props: ContentViewProps) => {
   const { query, history, mode, setMode, setSelectedId, setIsInit, setIsEmpty } = props;
   const agent = useProxy();
@@ -58,7 +62,7 @@ export const ContentView = (props: ContentViewProps) => {
   const [querying, setQuerying] = useState<Querying | null>();
   const [finishReason, setFinishReason] = useState<FinishReason | null>();
   const [translatedText, setTranslatedText] = useState("");
-  const [showMetadata, setShowMetadata] = useState(false);
+  const [showMetadata, setShowMetadata] = useState(alwayShowMetadata);
 
   function updateData() {
     if (history.data) {
