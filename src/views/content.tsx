@@ -1,17 +1,17 @@
 import { Action, ActionPanel, confirmAlert, getPreferenceValues, Icon, List, showToast, Toast } from "@raycast/api";
-import { DetailView } from "./detail";
-import { EmptyView } from "./empty";
-import { QueryHook } from "../hooks/useQuery";
-import { useProxy } from "../hooks/useProxy";
-import { Record, HistoryHook } from "../hooks/useHistory";
+import capitalize from "capitalize";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import capitalize from "capitalize";
 import { getLoadActionSection } from "../actions/load";
 import { getModeActionSection } from "../actions/mode";
-import { TranslateMode, TranslateQuery } from "../providers/types";
-import { detectLang } from "../providers/lang";
+import { HistoryHook, Record } from "../hooks/useHistory";
+import { useProxy } from "../hooks/useProxy";
+import { QueryHook } from "../hooks/useQuery";
 import { getProvider } from "../providers";
+import { detectLang } from "../providers/lang";
+import { TranslateMode, TranslateQuery } from "../providers/types";
+import { DetailView } from "./detail";
+import { EmptyView } from "./empty";
 
 export interface ContentViewProps {
   query: QueryHook;
@@ -58,6 +58,7 @@ export const ContentView = (props: ContentViewProps) => {
   const [querying, setQuerying] = useState<Querying | null>();
   const [finishReason, setFinishReason] = useState<FinishReason | null>();
   const [translatedText, setTranslatedText] = useState("");
+  const [showMetadata, setShowMetadata] = useState(false);
 
   function updateData() {
     if (history.data) {
@@ -274,6 +275,16 @@ export const ContentView = (props: ContentViewProps) => {
       {getModeActionSection((mode) => {
         setMode(mode);
       })}
+      <ActionPanel.Section title="Options">
+        <Action
+          title="Hide Metadata"
+          icon={Icon.Eye}
+          shortcut={{ modifiers: ["cmd", "ctrl"], key: "h" }}
+          onAction={() => {
+            setShowMetadata(!showMetadata);
+          }}
+        />
+      </ActionPanel.Section>
       <ActionPanel.Section title="History">
         <Action
           title="Delete Item"
@@ -326,6 +337,7 @@ export const ContentView = (props: ContentViewProps) => {
             actions={getQueryingActionPanel()}
             detail={
               <DetailView
+                showMetadata={showMetadata}
                 text={translatedText}
                 original={querying ? querying.query.text : ""}
                 from={querying ? querying.query.detectFrom : "auto"}
@@ -345,6 +357,7 @@ export const ContentView = (props: ContentViewProps) => {
             actions={getRecordActionPanel(item)}
             detail={
               <DetailView
+                showMetadata={showMetadata}
                 text={item.result.text}
                 original={item.result.original}
                 from={item.result.from}
