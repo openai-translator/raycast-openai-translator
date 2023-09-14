@@ -10,7 +10,6 @@ const PROVIDER_LABEL: Record<string, string> = {
   palm2: "PaLM 2",
 };
 
-
 export interface DetailViewProps {
   text: string;
   original: string;
