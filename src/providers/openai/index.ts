@@ -111,7 +111,7 @@ export default class extends Provider {
       let targetTxt = "";
       const { content = "", role } = choices[0].delta;
 
-      targetTxt = content;
+      targetTxt = content ? content : "";
 
       if (quoteProcessor) {
         targetTxt = quoteProcessor.processText(targetTxt);
