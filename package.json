@@ -286,8 +286,20 @@
         {
           "value": "gpt-4-32k-0314",
           "title": "gpt-4-32k-0314"
+        },
+        {
+          "value": "custom",
+          "title": "custom"
         }
       ]
+    },
+    {
+      "name": "customModel",
+      "type": "textfield",
+      "required": false,
+      "title": "Custom Model",
+      "description": "Custom Model ID, which is only available when using the OpenAI provider and the API Model is set to custom",
+      "default": "gpt-3.5-turbo"
     },
     {
       "name": "toLang",
