@@ -1,56 +1,62 @@
-import { createParser } from "eventsource-parser";
-import fetch, { RequestInit } from "node-fetch";
+import { createParser, type ParsedEvent, type ReconnectInterval } from 'eventsource-parser';
+import fetch, { RequestInit, BodyInit } from "node-fetch";
+import { Readable,Transform, TransformCallback, TransformOptions } from 'stream';
 
-export interface FetchSSEOptions extends RequestInit {
-  onMessage(data: string): void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onError(error: any): void;
-}
 
-export async function fetchSSE(input: string, options: FetchSSEOptions) {
-  const { onMessage, onError, signal: originSignal, ...fetchOptions } = options;
+export async function* fetchSSE(
+  input: string,
+  options: RequestInit
+) {
+  const {signal: originSignal, ...fetchOptions } = options;
   const timeout = 15 * 1000;
-  let abortByTimeout = false;
-  try {
     const ctrl = new AbortController();
     const { signal } = ctrl;
     if (originSignal) {
       originSignal.addEventListener("abort", () => ctrl.abort());
     }
     const timerId = setTimeout(() => {
-      abortByTimeout = true;
       ctrl.abort();
     }, timeout);
+  try {
 
     const resp = await fetch(input, { ...fetchOptions, signal });
-
+    console.debug(`resp.status:${resp.status}`)
     clearTimeout(timerId);
 
-    if (resp.status !== 200) {
-      onError(await resp.json());
-      return;
-    }
-    const parser = createParser((event) => {
-      if (event.type === "event") {
-        onMessage(event.data);
-      }
-    });
-    if (resp.body) {
-      for await (const chunk of resp.body) {
-        if (chunk) {
-          const str = new TextDecoder().decode(chunk as ArrayBuffer);
-          parser.feed(str);
+     if (resp.status !== 200) {
+            const errorBody = await resp.json(); // Type the errorBody appropriately
+            throw errorBody;
         }
-      }
-    }
+    yield* Readable.from(resp.body).pipe(new EventTransform({ objectMode: true }));
+
   } catch (error) {
-    if (abortByTimeout) {
-      onError({ error: { message: "Connection Timeout" } });
+    console.debug(error)
+    if (ctrl.signal.aborted) {
+      throw new Error("Connection Timeout");
     } else {
-      onError({ error });
+      throw error;
     }
   }
 }
+
+class EventTransform extends Transform {
+  private parser = createParser((event: ParsedEvent | ReconnectInterval) => {
+        if (event.type === "event") {
+          this.push(event);
+        }
+      })
+  private decoder = new TextDecoder()
+  constructor(options? : TransformOptions) {
+    super(options);
+  }
+
+  _transform(chunk: Buffer, encoding: BufferEncoding, next: TransformCallback) {
+    this.parser.feed(this.decoder.decode(chunk as ArrayBuffer));
+    next();
+  }
+}
+
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function getErrorText(err: any): string {
   if (err instanceof Error) {

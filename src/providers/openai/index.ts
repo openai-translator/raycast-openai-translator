@@ -1,10 +1,12 @@
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Provider } from "../base";
+import { Provider, Message } from "../base";
 import { Prompt } from "../prompt";
 import { TranslateQuery } from "../types";
-import { fetchSSE, getErrorText } from "../utils";
+import { fetchSSE } from "../utils";
+
+
 
 export default class extends Provider {
   protected model: string;
@@ -18,13 +20,15 @@ export default class extends Provider {
     this.apikey = apikey;
   }
 
-  async doTranslate(query: TranslateQuery, prompt: Prompt): Promise<void> {
+  protected async *doTranslate(query: TranslateQuery, prompt: Prompt): AsyncGenerator<Message> {
     const body = this.body(query, prompt);
     const messages = this.messages(query, prompt);
     const headers = this.headers(query, prompt);
-    const onMessage = this.handleMessage(query, prompt);
 
     const isFirst = true;
+
+    const messageParser = this.handleMessage(prompt);
+
 
     body["messages"] = messages;
 
@@ -32,9 +36,9 @@ export default class extends Provider {
       ...this.options(query, prompt),
       body: JSON.stringify(body),
       headers,
-      onMessage,
     };
-    await fetchSSE(`${this.entrypoint}`, options);
+    const source = fetchSSE(`${this.entrypoint}`, options);
+    yield* messageParser(source);
   }
 
   headers(query: TranslateQuery, prompt: Prompt): Record<string, string> {
@@ -84,50 +88,54 @@ export default class extends Provider {
     ];
   }
 
-  handleMessage(query: TranslateQuery, prompt: Prompt): (msg: string) => void {
-    return (msg: string) => {
-      const { quoteProcessor, meta } = prompt;
-      const { isWordMode } = meta;
+  handleMessage(prompt: Prompt): (source: any)=>AsyncGenerator<Message> {
+    return async function* (source)  {
+      for await (const chunk of source) {
+        if(chunk){
+          const { quoteProcessor, meta } = prompt;
+          const { isWordMode } = meta;
+          let resp;
+          try {
+            resp = JSON.parse(chunk.data);
+            console.debug("=====parse=====");
+            console.debug(chunk.data);
+            // eslint-disable-next-line no-empty
+            const { choices } = resp;
+            if (!choices || choices.length === 0) {
+              console.debug({ error: "No result" });
+            } else {
+              const { finish_reason: finishReason } = choices[0];
+              if (finishReason) {
+                yield finishReason;
+              }else{
+                let targetTxt = "";
+                const { content = "", role } = choices[0].delta;
 
-      let resp;
-      try {
-        resp = JSON.parse(msg);
-        // eslint-disable-next-line no-empty
-      } catch (error) {
-        query.onFinish("stop");
-        return;
+                targetTxt = content ? content : "";
+
+                if (quoteProcessor) {
+                  targetTxt = quoteProcessor.processText(targetTxt);
+                }
+                yield { content: targetTxt, role, isWordMode };
+              }
+            }
+          } catch (error) {
+            console.debug({ error: "Parse error" });
+            yield "stop"
+          }
+        }else{
+          // TODO: find out why chunk is null
+          console.debug("chunk is null");
+        }
       }
-
-      const { choices } = resp;
-      if (!choices || choices.length === 0) {
-        return { error: "No result" };
-      }
-      const { finish_reason: finishReason } = choices[0];
-      if (finishReason) {
-        query.onFinish(finishReason);
-        return;
-      }
-
-      let targetTxt = "";
-      const { content = "", role } = choices[0].delta;
-
-      targetTxt = content ? content : "";
-
-      if (quoteProcessor) {
-        targetTxt = quoteProcessor.processText(targetTxt);
-      }
-      query.onMessage({ content: targetTxt, role, isWordMode });
-    };
+    }
   }
 
   options(query: TranslateQuery, prompt: Prompt) {
     return {
       method: "POST",
       signal: query.signal,
-      agent: query.agent,
-      onError: (err: any) => {
-        query.onError(getErrorText(err));
-      },
+      agent: query.agent
     };
   }
 }

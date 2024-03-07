@@ -12,6 +12,7 @@ import { detectLang } from "../providers/lang";
 import { TranslateMode, TranslateQuery } from "../providers/types";
 import { DetailView } from "./detail";
 import { EmptyView } from "./empty";
+import { getErrorText } from "../providers/utils";
 
 export interface ContentViewProps {
   query: QueryHook;
@@ -173,9 +174,30 @@ export const ContentView = (props: ContentViewProps) => {
         text,
         detectFrom,
         detectTo,
-        onMessage: (message) => {
+      },
+      id: "querying",
+    };
+    setTranslatedText("");
+    setQuerying(_querying);
+    query.updateText("");
+    const translationStream = provider.translate(_querying.query)
+    try{
+      for await (const message of translationStream){
+        console.debug("=====ui====")
+        console.debug(message)
+        if (typeof message === "string") {
+          setFinishReason({
+            reason: message,
+            error: `failed: ${message}`,
+            toast,
+            detectFrom,
+            detectTo,
+            text,
+            img,
+          });
+        }else {
           if (message.role) {
-            return;
+            continue;
           }
           // setIsWordMode(message.isWordMode)
           setTranslatedText((txt) => {
@@ -184,36 +206,20 @@ export const ContentView = (props: ContentViewProps) => {
             }
             return txt + message.content;
           });
-        },
-        onFinish: (reason) => {
-          setFinishReason({
-            reason,
-            error: `failed: ${reason}`,
-            toast,
-            detectFrom,
-            detectTo,
-            text,
-            img,
-          });
-        },
-        onError: (error) => {
-          setFinishReason({
-            reason: "error",
-            error,
-            toast,
-            detectFrom,
-            detectTo,
-            text,
-            img,
-          });
-        },
-      },
-      id: "querying",
-    };
-    setTranslatedText("");
-    setQuerying(_querying);
-    query.updateText("");
-    provider.translate(_querying.query);
+        }
+      }
+    }catch(error){
+      console.error(error)
+      setFinishReason({
+        reason: "error",
+        error: getErrorText(error),
+        toast,
+        detectFrom,
+        detectTo,
+        text,
+        img,
+      });
+    }
   }
 
   useEffect(() => {

@@ -7,9 +7,6 @@ export interface TranslateQuery {
   detectFrom: string;
   detectTo: string;
   mode: TranslateMode;
-  onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void;
-  onError: (error: string) => void;
-  onFinish: (reason: string) => void;
   signal: AbortSignal;
   agent?: SocksProxyAgent;
 }

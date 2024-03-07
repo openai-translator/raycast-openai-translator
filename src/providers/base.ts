@@ -15,9 +15,16 @@ export abstract class Provider {
     };
     return builders[query.mode](prompt);
   }
-  protected abstract doTranslate(query: TranslateQuery, prompt: Prompt): Promise<void>;
+  protected abstract doTranslate(query: TranslateQuery, prompt: Prompt): AsyncGenerator<Message>;
 
-  async translate(query: TranslateQuery) {
-    this.doTranslate(query, this.generatePrompt(query, promptBuilders));
+  async *translate(query: TranslateQuery): AsyncGenerator<Message> {
+    yield* this.doTranslate(query, this.generatePrompt(query, promptBuilders))
   }
 }
+
+/**
+Message has two types
+finishReason: string
+{ content: targetTxt, role, isWordMode }
+ */
+export type Message = string | { content: string; role: string; isWordMode: boolean; isFullText?: boolean};
