@@ -3,6 +3,7 @@ import fetch, { RequestInit, BodyInit } from "node-fetch";
 import { Readable,Transform, TransformCallback, TransformOptions } from 'stream';
 
 
+
 export async function* fetchSSE(
   input: string,
   options: RequestInit
@@ -23,11 +24,11 @@ export async function* fetchSSE(
     console.debug(`resp.status:${resp.status}`)
     clearTimeout(timerId);
 
-     if (resp.status !== 200) {
-            const errorBody = await resp.json(); // Type the errorBody appropriately
-            throw errorBody;
-        }
-    yield* Readable.from(resp.body).pipe(new EventTransform({ objectMode: true }));
+    if (resp.status !== 200) {
+      const errorBody = await resp.json();
+      throw errorBody;
+    }
+    yield* resp.body
 
   } catch (error) {
     console.debug(error)
@@ -39,14 +40,14 @@ export async function* fetchSSE(
   }
 }
 
-class EventTransform extends Transform {
+export class SSETransform extends Transform {
   private parser = createParser((event: ParsedEvent | ReconnectInterval) => {
         if (event.type === "event") {
           this.push(event);
         }
       })
   private decoder = new TextDecoder()
-  constructor(options? : TransformOptions) {
+  constructor(options: TransformOptions = { objectMode: true }) {
     super(options);
   }
 
@@ -59,6 +60,9 @@ class EventTransform extends Transform {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function getErrorText(err: any): string {
+  if (err instanceof Array) {
+    err = err[0];
+  }
   if (err instanceof Error) {
     return err.message;
   }

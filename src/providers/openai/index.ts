@@ -4,8 +4,8 @@
 import { Provider, Message } from "../base";
 import { Prompt } from "../prompt";
 import { TranslateQuery } from "../types";
-import { fetchSSE } from "../utils";
-
+import { fetchSSE, SSETransform } from "../utils";
+import { Readable, compose } from "stream";
 
 
 export default class extends Provider {
@@ -38,7 +38,9 @@ export default class extends Provider {
       headers,
     };
     const source = fetchSSE(`${this.entrypoint}`, options);
-    yield* messageParser(source);
+
+    yield* compose(source, new SSETransform(), messageParser);
+
   }
 
   headers(query: TranslateQuery, prompt: Prompt): Record<string, string> {
@@ -96,10 +98,9 @@ export default class extends Provider {
           const { isWordMode } = meta;
           let resp;
           try {
-            resp = JSON.parse(chunk.data);
             console.debug("=====parse=====");
             console.debug(chunk.data);
-            // eslint-disable-next-line no-empty
+            resp = JSON.parse(chunk.data);
             const { choices } = resp;
             if (!choices || choices.length === 0) {
               console.debug({ error: "No result" });

@@ -195,6 +195,7 @@ export const ContentView = (props: ContentViewProps) => {
             text,
             img,
           });
+          return
         }else {
           if (message.role) {
             continue;

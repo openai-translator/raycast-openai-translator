@@ -229,8 +229,8 @@
           "title": "Azure"
         },
         {
-          "value": "palm2",
-          "title": "PaLM 2"
+          "value": "gemini",
+          "title": "Gemini"
         }
       ]
     },

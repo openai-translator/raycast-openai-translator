@@ -5,14 +5,14 @@ import { Provider } from "./base";
 import openai from "./openai";
 import raycast from "./raycast";
 import azure from "./azure";
-import palm2 from "./palm2";
+import gemini from "./gemini";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const PROVIDER_CLASSES: Record<string, new (...args: any[]) => Provider> = {
-  openai: openai,
-  raycast: raycast,
-  azure: azure,
-  palm2: palm2,
+  openai,
+  raycast,
+  azure,
+  gemini,
 };
 
 const record: Record<string, Provider> = {};

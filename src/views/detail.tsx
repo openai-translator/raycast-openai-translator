@@ -8,6 +8,7 @@ const PROVIDER_LABEL: Record<string, string> = {
   raycast: "Raycast AI",
   azure: "Azure",
   palm2: "PaLM 2",
+  gemini: "Gemini",
 };
 
 export interface DetailViewProps {
