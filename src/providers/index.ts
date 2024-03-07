@@ -22,6 +22,7 @@ export function getProvider(provider: string): Provider {
       entrypoint: string;
       apikey: string;
       apiModel: string;
+      customModel: string;
     }>();
     const providerClass = PROVIDER_CLASSES[provider];
     record[provider] = new providerClass(preferences);

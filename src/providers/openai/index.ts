@@ -11,9 +11,19 @@ export default class extends Provider {
   protected entrypoint: string;
   protected apikey: string; //
 
-  constructor({ apiModel, entrypoint, apikey }: { apiModel: string; entrypoint: string; apikey: string }) {
+  constructor({
+    apiModel,
+    entrypoint,
+    apikey,
+    customModel,
+  }: {
+    apiModel: string;
+    entrypoint: string;
+    apikey: string;
+    customModel: string;
+  }) {
     super();
-    this.model = apiModel;
+    this.model = apiModel === "custom" ? customModel : apiModel;
     this.entrypoint = entrypoint;
     this.apikey = apikey;
   }
