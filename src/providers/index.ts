@@ -11,18 +11,13 @@ import gemini from "./gemini";
 const PROVIDER_CLASSES: Record<string, new (...args: any[]) => Provider> = {
   openai,
   raycast,
-  azure,
-  gemini,
+  other,
 };
 
 const record: Record<string, Provider> = {};
 export function getProvider(provider: string): Provider {
   if (!(provider in record)) {
-    const preferences = getPreferenceValues<{
-      entrypoint: string;
-      apikey: string;
-      apiModel: string;
-    }>();
+    const preferences = getPreferenceValues<ProviderProps>();
     const providerClass = PROVIDER_CLASSES[provider];
     record[provider] = new providerClass(preferences);
   }

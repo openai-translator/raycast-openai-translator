@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Provider, Message } from "../base";
 import { Prompt } from "../prompt";
-import { TranslateQuery } from "../types";
+import { TranslateQuery, ProviderProps } from "../types";
 import { fetchSSE } from "../utils";
 import { Readable, compose } from "stream";
 
@@ -11,15 +11,14 @@ import { parser } from 'stream-json';
 import { pick} from 'stream-json/filters/Pick';
 
 
-const MODEL_NAME = "gemini-pro";
-const ENTRYPOINT = "https://generativelanguage.googleapis.com/v1beta/models"
 const API = "streamGenerateContent"
 export default class extends Provider {
-  protected apikey: string; //
-
-  constructor({ apikey }: { apikey: string }) {
+  protected props: ProviderProps;
+  protected apikey: string
+  constructor(props: ProviderProps) {
     super();
-    this.apikey = apikey;
+    this.props = props
+    this.apikey = props.apikey!
   }
 
   protected async *doTranslate(query: TranslateQuery, prompt: Prompt): AsyncGenerator<Message> {
@@ -37,7 +36,7 @@ export default class extends Provider {
       body: JSON.stringify(body),
       headers
     };
-    const source = fetchSSE(`${ENTRYPOINT}/${MODEL_NAME}:${API}?key=${this.apikey}`, options);
+    const source = fetchSSE(`${this.props.entrypoint}/${this.props.apiModel}:${API}?key=${this.apikey}`, options);
 
     yield* compose(
       source,

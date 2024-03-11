@@ -19,7 +19,7 @@ export default class extends OpenAIProvider {
   headers(query: TranslateQuery, prompt: Prompt): Record<string, string> {
     return {
       "Content-Type": "application/json",
-      "api-key": this.apikey,
+      "api-key": this.apikey!,
     };
   }
 

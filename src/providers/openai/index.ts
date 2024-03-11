@@ -3,19 +3,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Provider, Message } from "../base";
 import { Prompt } from "../prompt";
-import { TranslateQuery } from "../types";
+import { TranslateQuery, ProviderProps } from "../types";
 import { fetchSSE, SSETransform } from "../utils";
 import { Readable, compose } from "stream";
 
 
 export default class extends Provider {
-  protected model: string;
+  protected model: string | undefined;
   protected entrypoint: string;
-  protected apikey: string; //
+  protected apikey: string | undefined; //
 
-  constructor({ apiModel, entrypoint, apikey }: { apiModel: string; entrypoint: string; apikey: string }) {
+  constructor({ apiModel, entrypoint, apikey }: ProviderProps) {
     super();
-    this.model = apiModel;
+    this.model = apiModel
     this.entrypoint = entrypoint;
     this.apikey = apikey;
   }
@@ -40,14 +40,13 @@ export default class extends Provider {
     const source = fetchSSE(`${this.entrypoint}`, options);
 
     yield* compose(source, new SSETransform(), messageParser);
-
   }
 
   headers(query: TranslateQuery, prompt: Prompt): Record<string, string> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
-    if (this.apikey != "none") {
+    if (this.apikey && this.apikey != "none") {
       headers["Authorization"] = `Bearer ${this.apikey}`;
     }
     return headers;

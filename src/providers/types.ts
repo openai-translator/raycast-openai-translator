@@ -18,3 +18,28 @@ export interface TranslateResult {
   to: string;
   error?: string;
 }
+
+export interface IModel {
+    id: string
+    name: string
+    description?: string
+}
+
+
+export interface IConfig {
+  requireModel: boolean
+  defaultModel: IModel | undefined
+  supportCustomModel: boolean
+  listModels(apikey: string | undefined): Promise<IModel[]>
+
+  defaultEntrypoint: string
+  supportCustomEntrypoint: boolean
+
+  requireApiKey: boolean
+}
+
+export interface ProviderProps {
+  apikey: string | undefined
+  apiModel: string | undefined
+  entrypoint: string
+}
