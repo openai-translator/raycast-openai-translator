@@ -39,6 +39,7 @@ export interface IConfig {
 }
 
 export interface ProviderProps {
+  name: string
   apikey: string | undefined
   apiModel: string | undefined
   entrypoint: string

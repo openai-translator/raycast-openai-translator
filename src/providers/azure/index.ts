@@ -1,18 +1,20 @@
 import OpenAIProvider from "../openai";
 import { Message } from "../base";
 import { Prompt } from "../prompt";
-import { TranslateQuery } from "../types";
+import { TranslateQuery, ProviderProps } from "../types";
+
+
 
 export default class extends OpenAIProvider {
   private isChatAPI: boolean;
-  constructor({ entrypoint, apikey }: { entrypoint: string; apikey: string }) {
-    super({ apiModel: "", entrypoint, apikey });
+  constructor(props: ProviderProps) {
+    super(props);
     // Azure OpenAI Service supports multiple API.
     // We should check if the settings.apiURLPath is match `/deployments/{deployment-id}/chat/completions`.
     // If not, we should use the legacy parameters.
-    console.log(entrypoint);
-    console.log(apikey);
-    this.isChatAPI = entrypoint.indexOf("/chat/completions") >= 0;
+    console.log(props.entrypoint);
+    console.log(props.apikey);
+    this.isChatAPI = props.entrypoint.indexOf("/chat/completions") >= 0;
     console.log(this.isChatAPI);
   }
 

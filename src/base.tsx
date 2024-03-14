@@ -1,4 +1,4 @@
-import { List, ActionPanel, Action, LaunchProps, Icon } from "@raycast/api";
+import { List, ActionPanel, Action, LaunchProps, Icon, getPreferenceValues } from "@raycast/api";
 import { useState } from "react";
 import { ContentView } from "./views/content";
 import { useQuery } from "./hooks/useQuery";
@@ -6,6 +6,8 @@ import { LangDropdown } from "./views/lang-dropdown";
 import { useHistory } from "./hooks/useHistory";
 import capitalize from "capitalize";
 import { TranslateMode } from "./providers/types";
+import { useProviders } from "./hooks/useProvider";
+import { createProvider } from "./providers";
 
 export default function getBase(
   props: LaunchProps,
@@ -35,8 +37,42 @@ export default function getBase(
     ocrImage,
   });
   const history = useHistory();
+
   const [isInit, setIsInit] = useState<boolean>(true);
   const [isEmpty, setIsEmpty] = useState<boolean>(true);
+
+  const {
+    provider: providerName,
+    entrypoint,
+    apikey,
+    apiModel
+  } = getPreferenceValues<{
+    entrypoint: string;
+    apikey: string;
+    apiModel: string;
+    provider: string;
+  }>();
+
+
+  const providers  = useProviders();
+  const provider = providerName=="other" ?
+    providers.selected ?
+      createProvider(
+        providers.selected.type,
+        providers.selected.props) :
+      undefined :
+    createProvider(providerName,
+      {
+        name: providerName,
+        entrypoint,
+        apikey,
+        apiModel
+      });
+  if (!provider) {
+    //TODO setup other provider first
+  }
+
+
   return (
     <List
       searchText={query.text}
@@ -72,6 +108,7 @@ export default function getBase(
       <ContentView
         query={query}
         history={history}
+        provider={provider}
         mode={mode}
         setMode={setMode}
         setSelectedId={setSelectedId}

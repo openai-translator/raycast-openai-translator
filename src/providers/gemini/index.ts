@@ -16,7 +16,7 @@ export default class extends Provider {
   protected props: ProviderProps;
   protected apikey: string
   constructor(props: ProviderProps) {
-    super();
+    super(props);
     this.props = props
     this.apikey = props.apikey!
   }

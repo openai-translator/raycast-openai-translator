@@ -13,11 +13,11 @@ export default class extends Provider {
   protected entrypoint: string;
   protected apikey: string | undefined; //
 
-  constructor({ apiModel, entrypoint, apikey }: ProviderProps) {
-    super();
-    this.model = apiModel
-    this.entrypoint = entrypoint;
-    this.apikey = apikey;
+  constructor(props: ProviderProps) {
+    super(props);
+    this.model = props.apiModel
+    this.entrypoint = props.entrypoint;
+    this.apikey = props.apikey;
   }
 
   protected async *doTranslate(query: TranslateQuery, prompt: Prompt): AsyncGenerator<Message> {

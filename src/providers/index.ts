@@ -1,4 +1,3 @@
-import { getPreferenceValues } from "@raycast/api";
 import { Provider } from "./base";
 
 //XXX raycast doesn't support dynamic import
@@ -6,20 +5,18 @@ import openai from "./openai";
 import raycast from "./raycast";
 import azure from "./azure";
 import gemini from "./gemini";
+
+import { ProviderProps } from "./types";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const PROVIDER_CLASSES: Record<string, new (...args: any[]) => Provider> = {
   openai,
   raycast,
-  other,
+  azure,
+  gemini
 };
 
-const record: Record<string, Provider> = {};
-export function getProvider(provider: string): Provider {
-  if (!(provider in record)) {
-    const preferences = getPreferenceValues<ProviderProps>();
-    const providerClass = PROVIDER_CLASSES[provider];
-    record[provider] = new providerClass(preferences);
-  }
-  return record[provider];
+export function createProvider(type: string, props: ProviderProps): Provider {
+  const providerClass = PROVIDER_CLASSES[type];
+  return new providerClass(props);
 }

@@ -1,7 +1,13 @@
 import { generatMetadata, Prompt, PromptBuilder, promptBuilders } from "./prompt";
-import { TranslateMode, TranslateQuery } from "./types";
+import { ProviderProps, TranslateMode, TranslateQuery } from "./types";
 
 export abstract class Provider {
+  name: string
+
+  constructor(props: ProviderProps) {
+    this.name = props.name
+  }
+
   protected generatePrompt(query: TranslateQuery, builders: Record<TranslateMode, PromptBuilder>): Prompt {
     const meta = generatMetadata(query);
     const prompt = {

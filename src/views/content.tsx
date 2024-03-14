@@ -7,16 +7,17 @@ import { getModeActionSection } from "../actions/mode";
 import { HistoryHook, Record } from "../hooks/useHistory";
 import { useProxy } from "../hooks/useProxy";
 import { QueryHook } from "../hooks/useQuery";
-import { getProvider } from "../providers";
 import { detectLang } from "../providers/lang";
 import { TranslateMode, TranslateQuery } from "../providers/types";
 import { DetailView } from "./detail";
 import { EmptyView } from "./empty";
 import { getErrorText } from "../providers/utils";
+import { Provider } from "../providers/base";
 
 export interface ContentViewProps {
   query: QueryHook;
   history: HistoryHook;
+  provider: Provider;
   mode: TranslateMode;
   setMode: (value: TranslateMode) => void;
   setSelectedId: (value: string) => void;
@@ -43,27 +44,23 @@ type FinishReason = {
   img: string | undefined;
 };
 
-const { provider: providerName } = getPreferenceValues<{
-  entrypoint: string;
-  apikey: string;
-  apiModel: string;
-  provider: string;
-}>();
 
-const provider = getProvider(providerName);
+
 
 const { alwayShowMetadata } = getPreferenceValues<{
   alwayShowMetadata: boolean;
 }>();
 
 export const ContentView = (props: ContentViewProps) => {
-  const { query, history, mode, setMode, setSelectedId, setIsInit, setIsEmpty } = props;
+  const { query, history, provider, mode, setMode, setSelectedId, setIsInit, setIsEmpty } = props;
   const agent = useProxy();
   const [data, setData] = useState<ViewItem[]>();
   const [querying, setQuerying] = useState<Querying | null>();
   const [finishReason, setFinishReason] = useState<FinishReason | null>();
   const [translatedText, setTranslatedText] = useState("");
   const [showMetadata, setShowMetadata] = useState(alwayShowMetadata);
+
+
 
   function updateData() {
     if (history.data) {
@@ -102,7 +99,7 @@ export const ContentView = (props: ContentViewProps) => {
         error: message,
       },
       ocrImg: img,
-      provider: providerName,
+      provider: provider.name,
     };
     history.add(record);
     setFinishReason(null);
@@ -127,7 +124,7 @@ export const ContentView = (props: ContentViewProps) => {
         text: newText,
       },
       ocrImg: img,
-      provider: providerName,
+      provider: provider.name,
     };
     history.add(record);
     setFinishReason(null);
@@ -355,7 +352,7 @@ export const ContentView = (props: ContentViewProps) => {
                 mode={querying ? querying.query.mode : "translate"}
                 ocrImg={query.ocrImage}
                 to={query.to}
-                provider={providerName}
+                provider={provider.name}
               />
             }
           />

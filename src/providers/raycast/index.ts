@@ -1,4 +1,5 @@
 import { AI, environment } from "@raycast/api";
+import { ProviderProps } from "../types";
 import { Provider, Message } from "../base";
 import { Prompt } from "../prompt";
 import { TranslateQuery } from "../types";
@@ -6,6 +7,10 @@ import { TranslateQuery } from "../types";
 const MODEL_NAME = "gpt-3.5-turbo";
 
 export default class extends Provider {
+  constructor(_: ProviderProps) {
+    super(_);
+  }
+
   protected async *doTranslate(query: TranslateQuery, prompt: Prompt): AsyncGenerator<Message> {
     const { signal: originSignal } = query;
     const { rolePrompt, assistantPrompts, commandPrompt, contentPrompt, quoteProcessor, meta } = prompt;
