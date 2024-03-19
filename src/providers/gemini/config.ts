@@ -16,7 +16,7 @@ const config: IConfig = {
       { name: 'gemini-1.0-pro-vision-latest', id: 'gemini-1.0-pro-vision-latest' },
     ])
   },
-  defaultEntrypoint: "https://api.openai.com/v1/chat/completions",
+  defaultEntrypoint: "https://generativelanguage.googleapis.com/v1beta/models",
   supportCustomEntrypoint: false,
   requireApiKey: true,
 }
