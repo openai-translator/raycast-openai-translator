@@ -232,8 +232,8 @@
           "title": "Raycast AI"
         },
         {
-          "value": "other",
-          "title": "Other..."
+          "value": "custom",
+          "title": "Custom..."
         }
       ]
     },

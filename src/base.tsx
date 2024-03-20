@@ -1,4 +1,4 @@
-import { List, ActionPanel, Action, LaunchProps, Icon, getPreferenceValues } from "@raycast/api";
+import { List, ActionPanel, Action, LaunchProps, Icon, getPreferenceValues, launchCommand, LaunchType } from "@raycast/api";
 import { useState } from "react";
 import { ContentView } from "./views/content";
 import { useQuery } from "./hooks/useQuery";
@@ -53,68 +53,73 @@ export default function getBase(
     provider: string;
   }>();
 
-
-  const providers  = useProviders();
-  const provider = providerName=="other" ?
-    providers.selected ?
-      createProvider(
-        providers.selected.type,
-        providers.selected.props) :
-      undefined :
-    createProvider(providerName,
+  let provider = undefined
+  if (providerName=="custom"){
+    const providers  = useProviders();
+    if(!providers.isLoading){
+      provider = providers.selected ?
+        createProvider(providers.selected.type, providers.selected.props) :
+        undefined;
+      if (!provider) {
+        launchCommand({
+          name: "provider",
+          type: LaunchType.UserInitiated
+        });
+      }
+    }
+  }else{
+    provider = createProvider(providerName,
       {
         name: providerName,
         entrypoint,
         apikey,
         apiModel
       });
-  if (!provider) {
-    //TODO setup other provider first
   }
-
-
-  return (
-    <List
-      searchText={query.text}
-      isShowingDetail={!isInit && !isEmpty}
-      filtering={false}
-      isLoading={isInit}
-      selectedItemId={selectedId}
-      searchBarPlaceholder={`${capitalize(mode)}...`}
-      onSearchTextChange={query.updateText}
-      searchBarAccessory={
-        <LangDropdown
-          type={query.langType}
-          selectedStandardLang={query.langType == "To" ? query.to : query.from}
-          onLangChange={query.langType == "To" ? query.updateTo : query.updateFrom}
-        />
-      }
-      throttle={false}
-      navigationTitle={capitalize(mode)}
-      actions={
-        <ActionPanel>
-          {query.text && (
-            <Action title={capitalize(mode)} icon={Icon.Book} onAction={() => query.updateQuerying(true)} />
-          )}
-          <Action
-            title={`Switch to Translate ${query.langType == "To" ? "From" : "To"}`}
-            onAction={() => {
-              query.updateLangType(query.langType == "To" ? "From" : "To");
-            }}
+  if(provider){
+    return (
+      <List
+        searchText={query.text}
+        isShowingDetail={!isInit && !isEmpty}
+        filtering={false}
+        isLoading={isInit}
+        selectedItemId={selectedId}
+        searchBarPlaceholder={`${capitalize(mode)}...`}
+        onSearchTextChange={query.updateText}
+        searchBarAccessory={
+          <LangDropdown
+            type={query.langType}
+            selectedStandardLang={query.langType == "To" ? query.to : query.from}
+            onLangChange={query.langType == "To" ? query.updateTo : query.updateFrom}
           />
-        </ActionPanel>
-      }
-    >
-      <ContentView
-        query={query}
-        history={history}
-        provider={provider}
-        mode={mode}
-        setMode={setMode}
-        setSelectedId={setSelectedId}
-        setIsInit={setIsInit}
-        setIsEmpty={setIsEmpty}
-      />
-    </List>
-  );
+        }
+        throttle={false}
+        navigationTitle={capitalize(mode)}
+        actions={
+          <ActionPanel>
+            {query.text && (
+              <Action title={capitalize(mode)} icon={Icon.Book} onAction={() => query.updateQuerying(true)} />
+            )}
+            <Action
+              title={`Switch to Translate ${query.langType == "To" ? "From" : "To"}`}
+              onAction={() => {
+                query.updateLangType(query.langType == "To" ? "From" : "To");
+              }}
+            />
+          </ActionPanel>
+        }
+      >
+        <ContentView
+          query={query}
+          history={history}
+          provider={provider}
+          mode={mode}
+          setMode={setMode}
+          setSelectedId={setSelectedId}
+          setIsInit={setIsInit}
+          setIsEmpty={setIsEmpty}
+        />
+      </List>
+    );
+  }
 }

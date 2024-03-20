@@ -296,7 +296,7 @@ export const ContentView = (props: ContentViewProps) => {
       <ActionPanel.Section title="History">
         <Action
           title="Delete Item"
-          icon={Icon.Trash}
+          icon={{ source: Icon.Trash, tintColor: "red" }}
           style={Action.Style.Destructive}
           shortcut={{ modifiers: ["ctrl"], key: "x" }}
           onAction={async () => {

@@ -18,7 +18,8 @@ const config: IConfig = {
         return data.models
           .filter((m:any) => m.supportedGenerationMethods.includes("generateContent"))
           .map((m:any) => {
-            return {name: m.name, id: m.name }
+            const name = m.name.replace(/^models\//, '');
+            return {name, id: name }
           })
       }
     }

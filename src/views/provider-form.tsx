@@ -1,4 +1,4 @@
-import { Form, ActionPanel, Action } from "@raycast/api";
+import { Form, ActionPanel, Action, Icon } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IConfig, IModel } from "../providers/types";
@@ -177,7 +177,9 @@ export const ProviderForm = (props: ProviderFormProps) => {
       },
       created_at: new Date().toISOString(),
     })
-    onDone();
+    if(onDone){
+      onDone();
+    }
   }
 
 
@@ -189,11 +191,20 @@ export const ProviderForm = (props: ProviderFormProps) => {
         <ActionPanel>
           <Action.SubmitForm
             title={providerProps? "Update" : "Create"}
+            icon={{ source: Icon.Checkmark }}
             onSubmit={submitForm} />
-          <Action title="Cancel" onAction={onCancel} />
-          <Action title="Refresh Models" onAction={() => {
-            fetchModels();
-          }} />
+          <Action
+            title="Cancel"
+            icon={{ source: Icon.Xmark }}
+            onAction={onCancel} />
+          <Action
+            title="Refresh Models"
+            icon={{ source: Icon.Repeat }}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
+            onAction={() => {
+              fetchModels();
+            }}
+          />
         </ActionPanel>
       }>
       {!providerProps && (
