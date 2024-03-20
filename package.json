@@ -19,6 +19,13 @@
       "mode": "view"
     },
     {
+      "name": "provider",
+      "title": "Providers",
+      "subtitle": "Setup Providers",
+      "description": "Setup Providers",
+      "mode": "view"
+    },
+    {
       "name": "polishing",
       "title": "Polishing",
       "subtitle": "Based on ChatGPT API",
@@ -225,12 +232,8 @@
           "title": "Raycast AI"
         },
         {
-          "value": "azure",
-          "title": "Azure"
-        },
-        {
-          "value": "gemini",
-          "title": "Gemini"
+          "value": "other",
+          "title": "Other..."
         }
       ]
     },
@@ -259,34 +262,21 @@
       "default": "gpt-3.5-turbo-0613",
       "description": "Choose an OpenAI API model, which is only available when using the OpenAI provider",
       "data": [
-        {
-          "value": "gpt-3.5-turbo-0613",
-          "title": "gpt-3.5-turbo-0613"
-        },
-        {
-          "value": "gpt-3.5-turbo",
-          "title": "gpt-3.5-turbo"
-        },
-        {
-          "value": "gpt-3.5-turbo-0301",
-          "title": "gpt-3.5-turbo-0301"
-        },
-        {
-          "value": "gpt-4",
-          "title": "gpt-4"
-        },
-        {
-          "value": "gpt-4-0314",
-          "title": "gpt-4-0314"
-        },
-        {
-          "value": "gpt-4-32k",
-          "title": "gpt-4-32k"
-        },
-        {
-          "value": "gpt-4-32k-0314",
-          "title": "gpt-4-32k-0314"
-        }
+        { "title": "gpt-3.5-turbo-1106", "value": "gpt-3.5-turbo-1106" },
+        { "title": "gpt-3.5-turbo", "value": "gpt-3.5-turbo" },
+        { "title": "gpt-3.5-turbo-0613", "value": "gpt-3.5-turbo-0613" },
+        { "title": "gpt-3.5-turbo-0301", "value": "gpt-3.5-turbo-0301" },
+        { "title": "gpt-3.5-turbo-16k", "value": "gpt-3.5-turbo-16k" },
+        { "title": "gpt-3.5-turbo-16k-0613", "value": "gpt-3.5-turbo-16k-0613" },
+        { "title": "gpt-4", "value": "gpt-4" },
+        { "title": "gpt-4-turbo-preview", "value": "gpt-4-turbo-preview" },
+        { "title": "gpt-4-0125-preview (recommended)", "value": "gpt-4-0125-preview" },
+        { "title": "gpt-4-1106-preview", "value": "gpt-4-1106-preview" },
+        { "title": "gpt-4-0314", "value": "gpt-4-0314" },
+        { "title": "gpt-4-0613", "value": "gpt-4-0613" },
+        { "title": "gpt-4-32k", "value": "gpt-4-32k" },
+        { "title": "gpt-4-32k-0314", "value": "gpt-4-32k-0314" },
+        { "title": "gpt-4-32k-0613", "value": "gpt-4-32k-0613" }
       ]
     },
     {

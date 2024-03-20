@@ -60,8 +60,7 @@ export const ProviderForm = (props: ProviderFormProps) => {
   ].config);
 
   const [models, setModels] = useState<IModel[]>([]);
-  const [model, setModel] = useState<string | undefined >(
-    providerProps? providerProps.apiModel :  config.defaultModel?.id);
+  const [model, setModel] = useState<string | undefined >("");
   const [isModelLoading, setIsModelLoading] = useState(false);
 
   const customModel = { id: "custom", name: "Custom..." };
@@ -79,9 +78,10 @@ export const ProviderForm = (props: ProviderFormProps) => {
 
 
   useEffect(() => {
+    console.log("config changed", apikey);
+    setModel(providerProps? providerProps.apiModel :  config.defaultModel?.id);
     fetchModels();
-  }, [config, apikey
-  ]);
+  }, [config]);
 
   const fetchModels = async () => {
     try {
@@ -115,6 +115,7 @@ export const ProviderForm = (props: ProviderFormProps) => {
   function handleAPIKeyChange(value: string) {
     setAPIKey(value);
     if (apiKeyError && apiKeyError.length > 0) {
+      //reset error
       setAPIKeyError(undefined);
     }
   }
@@ -166,7 +167,7 @@ export const ProviderForm = (props: ProviderFormProps) => {
     }
 
     hook.addOrUpdate({
-      id: uuidv4(),
+      id: record? record?.id : uuidv4(),
       type: providerByConfig(config).value,
       props: {
         name: name,
@@ -183,12 +184,16 @@ export const ProviderForm = (props: ProviderFormProps) => {
 
   return (
     <Form
+      isLoading={isModelLoading}
       actions={
         <ActionPanel>
           <Action.SubmitForm
             title={providerProps? "Update" : "Create"}
             onSubmit={submitForm} />
           <Action title="Cancel" onAction={onCancel} />
+          <Action title="Refresh Models" onAction={() => {
+            fetchModels();
+          }} />
         </ActionPanel>
       }>
       {!providerProps && (
@@ -228,6 +233,7 @@ export const ProviderForm = (props: ProviderFormProps) => {
       <Form.PasswordField
         id="apikey"
         title="API Key"
+        value={apikey}
         error={apiKeyError}
         onChange={handleAPIKeyChange}
         onBlur={(event) => {
@@ -241,7 +247,7 @@ export const ProviderForm = (props: ProviderFormProps) => {
         id="model"
         title="Model"
         isLoading={isModelLoading}
-        defaultValue={model}
+        defaultValue={models.length ? model : ""}
         onChange={handleModelChange}>
         {models.map((model => (
           <Form.Dropdown.Item key={model.id} value={model.id} title={model.name} />

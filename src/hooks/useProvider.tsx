@@ -61,7 +61,17 @@ export function useProviders(): ProvidersHook {
         if(data.length == 0) {
           setSelected(record);
         }
-        setData([record, ...data]);
+        if(data.find((item) => item.id == record.id)) {
+          const newData = data.map((item) => {
+            if (item.id === record.id) {
+              return record;
+            }
+            return item;
+          });
+          setData(newData);
+        } else {
+          setData([record, ...data]);
+        }
       }
     },
     [setData, data]
