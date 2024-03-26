@@ -19,7 +19,6 @@ export default class extends Provider {
     const timeout = 15 * 1000;
     const ctrl = new AbortController();
     try {
-
       const { signal } = ctrl;
       if (originSignal) {
         originSignal.addEventListener("abort", () => ctrl.abort());
@@ -48,9 +47,9 @@ export default class extends Provider {
         targetTxt = quoteProcessor.processText(targetTxt);
       }
       yield { content: targetTxt, role: "", isWordMode };
-      yield "stop"
+      yield "stop";
     } catch (error) {
-      console.debug(error)
+      console.debug(error);
       if (ctrl.signal.aborted) {
         throw new Error("Connection Timeout");
       } else {

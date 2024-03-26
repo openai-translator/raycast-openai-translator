@@ -7,18 +7,17 @@ import { TranslateQuery, ProviderProps } from "../types";
 import { fetchSSE } from "../utils";
 import { Readable, compose } from "stream";
 
-import { parser } from 'stream-json';
-import { pick} from 'stream-json/filters/Pick';
+import { parser } from "stream-json";
+import { pick } from "stream-json/filters/Pick";
 
-
-const API = "streamGenerateContent"
+const API = "streamGenerateContent";
 export default class extends Provider {
   protected props: ProviderProps;
-  protected apikey: string
+  protected apikey: string;
   constructor(props: ProviderProps) {
     super(props);
-    this.props = props
-    this.apikey = props.apikey!
+    this.props = props;
+    this.apikey = props.apikey!;
   }
 
   protected async *doTranslate(query: TranslateQuery, prompt: Prompt): AsyncGenerator<Message> {
@@ -34,44 +33,44 @@ export default class extends Provider {
     const options = {
       ...this.options(query, prompt),
       body: JSON.stringify(body),
-      headers
+      headers,
     };
     const source = fetchSSE(`${this.props.entrypoint}/${this.props.apiModel}:${API}?key=${this.apikey}`, options);
 
     yield* compose(
       source,
-      parser({packStrings: false, packKeys: true}),
-      pick({filter: /(candidates)|(promptFeedback)/i}),
-      async function* (source: Iterable<{name: string; value: any}>) {
-        let textMode = false
-        for await (const {name, value} of source) {
-          if(textMode){
-            switch(name){
+      parser({ packStrings: false, packKeys: true }),
+      pick({ filter: /(candidates)|(promptFeedback)/i }),
+      async function* (source: Iterable<{ name: string; value: any }>) {
+        let textMode = false;
+        for await (const { name, value } of source) {
+          if (textMode) {
+            switch (name) {
               case "stringChunk":
-                yield value
-                break
+                yield value;
+                break;
               case "endString":
-                textMode = false
-                break
+                textMode = false;
+                break;
             }
-          } else if(name == "keyValue"){
-            switch(value){
+          } else if (name == "keyValue") {
+            switch (value) {
               case "blockReasonMessage":
-                throw new Error(value.blockReasonMessage)
+                throw new Error(value.blockReasonMessage);
               case "text":
-                textMode = true
+                textMode = true;
                 break;
             }
           }
         }
       },
-      async function* (source: Iterable<string>){
+      async function* (source: Iterable<string>) {
         for await (const chunk of source) {
-          console.log(chunk)
+          console.log(chunk);
           if (chunk) {
             let targetTxt = "";
-            const content = chunk
-            const role = null//msg[0].content.role;
+            const content = chunk;
+            const role = null; //msg[0].content.role;
             targetTxt = content ? content : "";
             if (quoteProcessor) {
               targetTxt = quoteProcessor.processText(targetTxt);
@@ -79,11 +78,10 @@ export default class extends Provider {
             yield { content: targetTxt, role, isWordMode };
           }
         }
-      }
+      },
     );
 
     yield "stop";
-
   }
 
   headers(query: TranslateQuery, prompt: Prompt): Record<string, string> {
@@ -100,28 +98,28 @@ export default class extends Provider {
       safetySettings: [
         {
           category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_NONE"
+          threshold: "BLOCK_NONE",
         },
         {
           category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_NONE"
+          threshold: "BLOCK_NONE",
         },
         {
           category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold: "BLOCK_NONE"
+          threshold: "BLOCK_NONE",
         },
         {
           category: "HARM_CATEGORY_HATE_SPEECH",
-          threshold: "BLOCK_NONE"
-        }
+          threshold: "BLOCK_NONE",
+        },
       ],
-      generationConfig :{
+      generationConfig: {
         stopSequences: quoteProcessor ? [quoteProcessor.quoteEnd] : [],
         temperature: isWordMode ? 0.7 : 0,
         maxOutputTokens: 1000,
         topP: 1,
-      }
-    }
+      },
+    };
   }
 
   messages(query: TranslateQuery, prompt: Prompt): any {
@@ -129,25 +127,23 @@ export default class extends Provider {
 
     return [
       {
-
         parts: [
-          {text: rolePrompt},
+          { text: rolePrompt },
           ...assistantPrompts.map((prompt) => {
-            return {text: prompt}
+            return { text: prompt };
           }),
-          {text: commandPrompt},
-          {text: contentPrompt}
-        ]
-      }
+          { text: commandPrompt },
+          { text: contentPrompt },
+        ],
+      },
     ];
   }
-
 
   options(query: TranslateQuery, prompt: Prompt) {
     return {
       method: "POST",
       signal: query.signal,
-      agent: query.agent
+      agent: query.agent,
     };
   }
 }

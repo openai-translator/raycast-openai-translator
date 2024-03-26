@@ -7,7 +7,6 @@ import { TranslateQuery, ProviderProps } from "../types";
 import { fetchSSE, SSETransform } from "../utils";
 import { Readable, compose } from "stream";
 
-
 export default class extends Provider {
   protected model: string | undefined;
   protected entrypoint: string;
@@ -15,7 +14,7 @@ export default class extends Provider {
 
   constructor(props: ProviderProps) {
     super(props);
-    this.model = props.apiModel
+    this.model = props.apiModel;
     this.entrypoint = props.entrypoint;
     this.apikey = props.apikey;
   }
@@ -28,7 +27,6 @@ export default class extends Provider {
     const isFirst = true;
 
     const messageParser = this.handleMessage(prompt);
-
 
     body["messages"] = messages;
 
@@ -89,16 +87,17 @@ export default class extends Provider {
     ];
   }
 
-  handleMessage(prompt: Prompt): (source: any)=>AsyncGenerator<Message> {
-    return async function* (source)  {
+  handleMessage(prompt: Prompt): (source: any) => AsyncGenerator<Message> {
+    return async function* (source) {
       for await (const chunk of source) {
-        if(chunk){
+        // console.debug(chunk)
+        if (chunk) {
           const { quoteProcessor, meta } = prompt;
           const { isWordMode } = meta;
           let resp;
           try {
-            console.debug("=====parse=====");
-            console.debug(chunk.data);
+            // console.debug("=====parse=====");
+            // console.debug(chunk.data);
             resp = JSON.parse(chunk.data);
             const { choices } = resp;
             if (!choices || choices.length === 0) {
@@ -107,7 +106,7 @@ export default class extends Provider {
               const { finish_reason: finishReason } = choices[0];
               if (finishReason) {
                 yield finishReason;
-              }else{
+              } else {
                 let targetTxt = "";
                 const { content = "", role } = choices[0].delta;
 
@@ -121,21 +120,21 @@ export default class extends Provider {
             }
           } catch (error) {
             console.debug({ error: "Parse error" });
-            yield "stop"
+            yield "stop";
           }
-        }else{
+        } else {
           // TODO: find out why chunk is null
           console.debug("chunk is null");
         }
       }
-    }
+    };
   }
 
   options(query: TranslateQuery, prompt: Prompt) {
     return {
       method: "POST",
       signal: query.signal,
-      agent: query.agent
+      agent: query.agent,
     };
   }
 }

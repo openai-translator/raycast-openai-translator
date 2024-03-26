@@ -20,27 +20,27 @@ export interface TranslateResult {
 }
 
 export interface IModel {
-    id: string
-    name: string
-    description?: string
+  id: string;
+  name: string;
+  description?: string;
 }
 
-
 export interface IConfig {
-  requireModel: boolean
-  defaultModel: IModel | undefined
-  supportCustomModel: boolean
-  listModels(apikey: string | undefined): Promise<IModel[]>
+  requireModel: boolean;
+  defaultModel: IModel | undefined;
+  supportCustomModel: boolean;
+  listModels(apikey: string | undefined): Promise<IModel[]>;
 
-  defaultEntrypoint: string
-  supportCustomEntrypoint: boolean
+  defaultEntrypoint: string;
+  supportCustomEntrypoint: boolean;
 
-  requireApiKey: boolean
+  requireApiKey: boolean;
+  hasApiKey: boolean;
 }
 
 export interface ProviderProps {
-  name: string
-  apikey: string | undefined
-  apiModel: string | undefined
-  entrypoint: string
+  name: string;
+  apikey: string | undefined;
+  apiModel: string | undefined;
+  entrypoint: string;
 }

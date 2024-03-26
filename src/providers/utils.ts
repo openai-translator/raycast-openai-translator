@@ -1,37 +1,31 @@
-import { createParser, type ParsedEvent, type ReconnectInterval } from 'eventsource-parser';
-import fetch, { RequestInit, BodyInit } from "node-fetch";
-import { Readable,Transform, TransformCallback, TransformOptions } from 'stream';
+import { createParser, type ParsedEvent, type ReconnectInterval } from "eventsource-parser";
+import fetch, { RequestInit } from "node-fetch";
+import { Transform, TransformCallback, TransformOptions } from "stream";
 
-
-
-export async function* fetchSSE(
-  input: string,
-  options: RequestInit
-) {
-  const {signal: originSignal, ...fetchOptions } = options;
-  const timeout = 15 * 1000;
-    const ctrl = new AbortController();
-    const { signal } = ctrl;
-    if (originSignal) {
-      originSignal.addEventListener("abort", () => ctrl.abort());
-    }
-    const timerId = setTimeout(() => {
-      ctrl.abort();
-    }, timeout);
+export const DEFAULT_TIMEOUT = 60 * 1000;
+export async function* fetchSSE(input: string, options: RequestInit) {
+  const { signal: originSignal, ...fetchOptions } = options;
+  const timeout = DEFAULT_TIMEOUT;
+  const ctrl = new AbortController();
+  const { signal } = ctrl;
+  if (originSignal) {
+    originSignal.addEventListener("abort", () => ctrl.abort());
+  }
+  const timerId = setTimeout(() => {
+    ctrl.abort();
+  }, timeout);
   try {
-
     const resp = await fetch(input, { ...fetchOptions, signal });
-    console.debug(`resp.status:${resp.status}`)
+    console.debug(`resp.status:${resp.status}`);
     clearTimeout(timerId);
 
     if (resp.status !== 200) {
       const errorBody = await resp.json();
       throw errorBody;
     }
-    yield* resp.body
-
+    yield* resp.body;
   } catch (error) {
-    console.debug(error)
+    console.debug(error);
     if (ctrl.signal.aborted) {
       throw new Error("Connection Timeout");
     } else {
@@ -42,11 +36,11 @@ export async function* fetchSSE(
 
 export class SSETransform extends Transform {
   private parser = createParser((event: ParsedEvent | ReconnectInterval) => {
-        if (event.type === "event") {
-          this.push(event);
-        }
-      })
-  private decoder = new TextDecoder()
+    if (event.type === "event") {
+      this.push(event);
+    }
+  });
+  private decoder = new TextDecoder();
   constructor(options: TransformOptions = { objectMode: true }) {
     super(options);
   }
@@ -57,23 +51,12 @@ export class SSETransform extends Transform {
   }
 }
 
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export function getErrorText(err: any): string {
+export function getErrorText(err): string {
   if (err instanceof Array) {
     err = err[0];
   }
-  if (err instanceof Error) {
-    return err.message;
-  }
   if (typeof err === "string") {
     return err;
-  }
-  if (typeof err === "object") {
-    const { detail } = err;
-    if (detail) {
-      return detail;
-    }
   }
   const { error } = err;
   if (error instanceof Error) {
@@ -83,6 +66,18 @@ export function getErrorText(err: any): string {
     const { message } = error;
     if (message) {
       return message;
+    }
+    if (error.error) {
+      if (error.error.message) return error.error.message;
+    }
+  }
+  if (err instanceof Error) {
+    return err.message;
+  }
+  if (typeof err === "object") {
+    const { detail } = err;
+    if (detail) {
+      return detail;
     }
   }
   return "Unexcept error";

@@ -3,8 +3,6 @@ import { Message } from "../base";
 import { Prompt } from "../prompt";
 import { TranslateQuery, ProviderProps } from "../types";
 
-
-
 export default class extends OpenAIProvider {
   private isChatAPI: boolean;
   constructor(props: ProviderProps) {
@@ -18,6 +16,7 @@ export default class extends OpenAIProvider {
     console.log(this.isChatAPI);
   }
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   headers(query: TranslateQuery, prompt: Prompt): Record<string, string> {
     return {
       "Content-Type": "application/json",
@@ -25,6 +24,7 @@ export default class extends OpenAIProvider {
     };
   }
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   /* eslint-disable @typescript-eslint/no-explicit-any */
   body(query: TranslateQuery, prompt: Prompt): Record<string, any> {
     const { rolePrompt, commandPrompt, contentPrompt } = prompt;
@@ -38,19 +38,18 @@ export default class extends OpenAIProvider {
     };
 
     if (!this.isChatAPI) {
-      body[
-        "prompt"
-      ] = `<|im_start|>system\n${rolePrompt}\n<|im_end|>\n<|im_start|>user\n${commandPrompt}\n${contentPrompt}\n<|im_end|>\n<|im_start|>assistant\n`;
+      body["prompt"] =
+        `<|im_start|>system\n${rolePrompt}\n<|im_end|>\n<|im_start|>user\n${commandPrompt}\n${contentPrompt}\n<|im_end|>\n<|im_start|>assistant\n`;
       body["stop"] = ["<|im_end|>"];
     }
     return body;
   }
 
-  handleMessage(prompt: Prompt): (source: any)=>AsyncGenerator<Message> {
+  handleMessage(prompt: Prompt): (source: any) => AsyncGenerator<Message> {
     const isChatAPI = this.isChatAPI;
-    return async function* (source)  {
+    return async function* (source) {
       for await (const chunk of source) {
-        if(chunk){
+        if (chunk) {
           const { quoteProcessor, meta } = prompt;
           const { isWordMode } = meta;
           let resp;
@@ -65,7 +64,7 @@ export default class extends OpenAIProvider {
               const { finish_reason: finishReason } = choices[0];
               if (finishReason) {
                 yield finishReason;
-              }else{
+              } else {
                 let targetTxt = "";
                 if (!isChatAPI) {
                   // It's used for Azure OpenAI Service's legacy parameters.
@@ -87,9 +86,9 @@ export default class extends OpenAIProvider {
             }
           } catch (error) {
             console.debug({ error: "Parse error" });
-            yield "stop"
+            yield "stop";
           }
-        }else{
+        } else {
           // TODO: find out why chunk is null
           console.debug("chunk is null");
         }

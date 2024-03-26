@@ -2,10 +2,10 @@ import { generatMetadata, Prompt, PromptBuilder, promptBuilders } from "./prompt
 import { ProviderProps, TranslateMode, TranslateQuery } from "./types";
 
 export abstract class Provider {
-  name: string
+  name: string;
 
   constructor(props: ProviderProps) {
-    this.name = props.name
+    this.name = props.name;
   }
 
   protected generatePrompt(query: TranslateQuery, builders: Record<TranslateMode, PromptBuilder>): Prompt {
@@ -24,7 +24,7 @@ export abstract class Provider {
   protected abstract doTranslate(query: TranslateQuery, prompt: Prompt): AsyncGenerator<Message>;
 
   async *translate(query: TranslateQuery): AsyncGenerator<Message> {
-    yield* this.doTranslate(query, this.generatePrompt(query, promptBuilders))
+    yield* this.doTranslate(query, this.generatePrompt(query, promptBuilders));
   }
 }
 
@@ -33,4 +33,4 @@ Message has two types
 finishReason: string
 { content: targetTxt, role, isWordMode }
  */
-export type Message = string | { content: string; role: string; isWordMode: boolean; isFullText?: boolean};
+export type Message = string | { content: string; role?: string | null; isWordMode: boolean; isFullText?: boolean };
