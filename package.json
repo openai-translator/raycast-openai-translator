@@ -49,7 +49,7 @@
       "name": "selected",
       "title": "Query Selected",
       "description": "Query selected text from frontmost application",
-      "mode": "view",
+      "mode": "no-view",
       "preferences": [
         {
           "name": "mode",
@@ -83,7 +83,7 @@
       "name": "clipboard",
       "title": "Query Clipboard",
       "description": "Query text from clipboard",
-      "mode": "view",
+      "mode": "no-view",
       "preferences": [
         {
           "name": "mode",

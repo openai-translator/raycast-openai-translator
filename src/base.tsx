@@ -31,7 +31,29 @@ export default function getBase(
     initialMode = props.launchContext["mode"] as TranslateMode;
     initialQuery = props.launchContext["txt"];
     ocrImage = props.launchContext["img"];
-    forceEnableAutoStart = true;
+    // if has key of autoStart, set it else set to false
+    if(props.launchContext["autoStart"]){
+      forceEnableAutoStart = props.launchContext["autoStart"] as boolean;
+    }else{
+      if(props.launchContext["img"]){
+        forceEnableAutoStart = true // ocr hack
+      }else{
+        forceEnableAutoStart = false
+      }
+    }
+
+    if(props.launchContext["loadSelected"]){
+      forceEnableAutoLoadSelected = props.launchContext["loadSelected"] as boolean;
+    }else{
+      forceEnableAutoLoadSelected = false
+    }
+
+    if(props.launchContext["loadClipboard"]){
+      forceEnableAutoLoadClipboard = props.launchContext["loadClipboard"] as boolean;
+    }else{
+      forceEnableAutoLoadClipboard = false
+    }
+
   } else {
     initialQuery = props.fallbackText;
   }
