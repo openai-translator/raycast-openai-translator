@@ -2,11 +2,10 @@ import { LocalStorage, showToast, Toast } from "@raycast/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ProviderProps } from "../providers/types";
 
-
 export interface Record {
   id: string;
   created_at: string;
-  type: string
+  type: string;
   props: ProviderProps;
 }
 
@@ -14,9 +13,9 @@ export interface ProvidersHook {
   data: Record[];
   isLoading: boolean;
   addOrUpdate: (arg: Record) => Promise<void>;
-  remove: (arg: Record) => Promise<void>
-  selected: Record | undefined
-  setSelected: (record: Record) => void
+  remove: (arg: Record) => Promise<void>;
+  selected: Record | undefined;
+  setSelected: (record: Record) => void;
 }
 
 export function useProviders(): ProvidersHook {
@@ -30,8 +29,8 @@ export function useProviders(): ProvidersHook {
       const stored = await LocalStorage.getItem<string>("providers");
       const _selected = await LocalStorage.getItem<string>("selected");
 
-      const data = stored ? JSON.parse(stored) : []
-      const selected = data.find((item: Record) => item.id == _selected)
+      const data = stored ? JSON.parse(stored) : [];
+      const selected = data.find((item: Record) => item.id == _selected);
 
       setData(data);
       setSelected(selected);
@@ -51,6 +50,8 @@ export function useProviders(): ProvidersHook {
   useEffect(() => {
     if (selected) {
       LocalStorage.setItem("selected", selected.id);
+    }else{
+      LocalStorage.removeItem("selected")
     }
   }, [selected]);
 
@@ -58,10 +59,10 @@ export function useProviders(): ProvidersHook {
     async (record: Record) => {
       const data = countRef.current;
       if (data) {
-        if(data.length == 0) {
+        if (data.length == 0) {
           setSelected(record);
         }
-        if(data.find((item) => item.id == record.id)) {
+        if (data.find((item) => item.id == record.id)) {
           const newData = data.map((item) => {
             if (item.id === record.id) {
               return record;
@@ -74,7 +75,7 @@ export function useProviders(): ProvidersHook {
         }
       }
     },
-    [setData, data]
+    [setData, data],
   );
 
   const remove = useCallback(
@@ -87,12 +88,22 @@ export function useProviders(): ProvidersHook {
         });
         const newData: Record[] = data.filter((item) => item.id !== record.id);
         setData(newData);
+        if(selected == record){
+          if(newData.length > 0){
+            setSelected(newData[0]);
+          } else {
+            setSelected(undefined);
+          }
+        }
         toast.title = "Record removed!";
         toast.style = Toast.Style.Success;
       }
     },
-    [setData, data]
+    [setData, data],
   );
 
-  return useMemo(() => ({ data, isLoading, addOrUpdate, remove, selected, setSelected}), [data, isLoading, addOrUpdate, remove, selected, setSelected]);
+  return useMemo(
+    () => ({ data, isLoading, addOrUpdate, remove, selected, setSelected }),
+    [data, isLoading, addOrUpdate, remove, selected, setSelected],
+  );
 }
