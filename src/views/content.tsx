@@ -44,9 +44,6 @@ type FinishReason = {
   img: string | undefined;
 };
 
-
-
-
 const { alwayShowMetadata } = getPreferenceValues<{
   alwayShowMetadata: boolean;
 }>();
@@ -60,12 +57,10 @@ export const ContentView = (props: ContentViewProps) => {
   const [translatedText, setTranslatedText] = useState("");
   const [showMetadata, setShowMetadata] = useState(alwayShowMetadata);
 
-
-
   function updateData() {
     if (history.data) {
       const sortedResults = history.data.sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
       );
       if (querying == null) {
         setData(sortedResults);
@@ -177,11 +172,11 @@ export const ContentView = (props: ContentViewProps) => {
     setTranslatedText("");
     setQuerying(_querying);
     query.updateText("");
-    const translationStream = provider.translate(_querying.query)
-    try{
-      for await (const message of translationStream){
-        console.debug("=====ui====")
-        console.debug(message)
+    try {
+      const translationStream = provider.translate(_querying.query);
+      for await (const message of translationStream) {
+        console.debug("=====ui====");
+        console.debug(message);
         if (typeof message === "string") {
           setFinishReason({
             reason: message,
@@ -192,11 +187,11 @@ export const ContentView = (props: ContentViewProps) => {
             text,
             img,
           });
-          return
-        }else {
-          if (message.role) {
-            continue;
-          }
+          return;
+        } else {
+          // if (message.role) {
+          //   continue;
+          // }
           // setIsWordMode(message.isWordMode)
           setTranslatedText((txt) => {
             if (message.isFullText) {
@@ -206,8 +201,8 @@ export const ContentView = (props: ContentViewProps) => {
           });
         }
       }
-    }catch(error){
-      console.error(error)
+    } catch (error) {
+      console.error(error);
       setFinishReason({
         reason: "error",
         error: getErrorText(error),

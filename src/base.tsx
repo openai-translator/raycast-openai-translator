@@ -1,4 +1,13 @@
-import { List, ActionPanel, Action, LaunchProps, Icon, getPreferenceValues, launchCommand, LaunchType } from "@raycast/api";
+import {
+  List,
+  ActionPanel,
+  Action,
+  LaunchProps,
+  Icon,
+  getPreferenceValues,
+  launchCommand,
+  LaunchType,
+} from "@raycast/api";
 import { useState } from "react";
 import { ContentView } from "./views/content";
 import { useQuery } from "./hooks/useQuery";
@@ -14,7 +23,7 @@ export default function getBase(
   initialMode: TranslateMode = "translate",
   forceEnableAutoStart = false,
   forceEnableAutoLoadSelected = false,
-  forceEnableAutoLoadClipboard = false
+  forceEnableAutoLoadClipboard = false,
 ) {
   let initialQuery: string | undefined = "";
   let ocrImage: string | undefined;
@@ -45,7 +54,7 @@ export default function getBase(
     provider: providerName,
     entrypoint,
     apikey,
-    apiModel
+    apiModel,
   } = getPreferenceValues<{
     entrypoint: string;
     apikey: string;
@@ -53,30 +62,27 @@ export default function getBase(
     provider: string;
   }>();
 
-  let provider = undefined
-  if (providerName=="custom"){
-    const providers  = useProviders();
-    if(!providers.isLoading){
-      provider = providers.selected ?
-        createProvider(providers.selected.type, providers.selected.props) :
-        undefined;
+  let provider = undefined;
+  if (providerName == "custom") {
+    const providers = useProviders();
+    if (!providers.isLoading) {
+      provider = providers.selected ? createProvider(providers.selected.type, providers.selected.props) : undefined;
       if (!provider) {
         launchCommand({
           name: "provider",
-          type: LaunchType.UserInitiated
+          type: LaunchType.UserInitiated,
         });
       }
     }
-  }else{
-    provider = createProvider(providerName,
-      {
-        name: providerName,
-        entrypoint,
-        apikey,
-        apiModel
-      });
+  } else {
+    provider = createProvider(providerName, {
+      name: providerName,
+      entrypoint,
+      apikey,
+      apiModel,
+    });
   }
-  if(provider){
+  if (provider) {
     return (
       <List
         searchText={query.text}

@@ -67,7 +67,7 @@ export function useHistory(): HistoryHook {
         setData([record, ...slice]);
       }
     },
-    [setData, data]
+    [setData, data],
   );
 
   const remove = useCallback(
@@ -85,7 +85,7 @@ export function useHistory(): HistoryHook {
         toast.style = Toast.Style.Success;
       }
     },
-    [setData, data]
+    [setData, data],
   );
 
   const clear = useCallback(async () => {
