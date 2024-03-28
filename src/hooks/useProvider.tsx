@@ -10,7 +10,7 @@ export interface Record {
 }
 
 export interface ProvidersHook {
-  data: Record[];
+  data: Record[] | undefined;
   isLoading: boolean;
   addOrUpdate: (arg: Record) => Promise<void>;
   remove: (arg: Record) => Promise<void>;
@@ -18,20 +18,38 @@ export interface ProvidersHook {
   setSelected: (record: Record) => void;
 }
 
+function encrypt(plaintext: string): string {
+  const key = 42;
+  let encrypted = "";
+  for (let i = 0; i < plaintext.length; i++) {
+    const charCode = plaintext.charCodeAt(i);
+    const encryptedCharCode = charCode ^ key;
+    encrypted += String.fromCharCode(encryptedCharCode);
+  }
+  return encrypted;
+}
+
 export function useProviders(): ProvidersHook {
   const [data, setData] = useState<Record[]>([]);
   const countRef = useRef(data);
   const [isLoading, setLoading] = useState<boolean>(true);
-  const [selected, setSelected] = useState<Record | undefined>();
+  const [selected, setSelected] = useState<Record>();
 
   useEffect(() => {
     (async () => {
       const stored = await LocalStorage.getItem<string>("providers");
       const _selected = await LocalStorage.getItem<string>("selected");
 
-      const data = stored ? JSON.parse(stored) : [];
+      const data = (stored ? JSON.parse(stored) : []).map((item: Record) => {
+        return {
+          ...item,
+          props: {
+            ...item.props,
+            apikey: item.props.apikey ? encrypt(item.props.apikey) : item.props.apikey,
+          },
+        };
+      });
       const selected = data.find((item: Record) => item.id == _selected);
-
       setData(data);
       setSelected(selected);
       setLoading(false);
@@ -43,6 +61,21 @@ export function useProviders(): ProvidersHook {
       if (countRef.current != data) {
         countRef.current = data;
       }
+      LocalStorage.setItem(
+        "providers",
+        JSON.stringify(
+          data.map((item) => {
+            return {
+              ...item,
+              props: {
+                ...item.props,
+                apikey: item.props.apikey ? encrypt(item.props.apikey) : item.props.apikey,
+              },
+            };
+          }),
+        ),
+      );
+    } else {
       LocalStorage.setItem("providers", JSON.stringify(data));
     }
   }, [data]);
@@ -50,8 +83,6 @@ export function useProviders(): ProvidersHook {
   useEffect(() => {
     if (selected) {
       LocalStorage.setItem("selected", selected.id);
-    }else{
-      LocalStorage.removeItem("selected")
     }
   }, [selected]);
 
@@ -88,11 +119,9 @@ export function useProviders(): ProvidersHook {
         });
         const newData: Record[] = data.filter((item) => item.id !== record.id);
         setData(newData);
-        if(selected == record){
-          if(newData.length > 0){
+        if (selected == record) {
+          if (newData.length > 0) {
             setSelected(newData[0]);
-          } else {
-            setSelected(undefined);
           }
         }
         toast.title = "Record removed!";
