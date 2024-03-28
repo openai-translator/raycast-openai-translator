@@ -3,6 +3,14 @@ import fetch from "node-fetch";
 
 const _baseUrl = "https://api.moonshot.cn";
 
+type ModelData = {
+  data: [
+    {
+      id: string;
+    },
+  ];
+};
+
 const config: IConfig = {
   requireModel: true,
   defaultModel: {
@@ -21,7 +29,7 @@ const config: IConfig = {
         },
       });
       if (resp.status == 200) {
-        const data = await resp.json();
+        const data = (await resp.json()) as ModelData;
         console.log(data);
         return data.data.map((m) => {
           const name = m.id;

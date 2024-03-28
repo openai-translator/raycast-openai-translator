@@ -15,8 +15,9 @@ import { LangDropdown } from "./views/lang-dropdown";
 import { useHistory } from "./hooks/useHistory";
 import capitalize from "capitalize";
 import { TranslateMode } from "./providers/types";
-import { useProviders } from "./hooks/useProvider";
+import { ProvidersHook, useProviders } from "./hooks/useProvider";
 import { createProvider } from "./providers";
+import { Provider } from "./providers/base";
 
 export default function getBase(
   props: LaunchProps,
@@ -32,28 +33,27 @@ export default function getBase(
     initialQuery = props.launchContext["txt"];
     ocrImage = props.launchContext["img"];
     // if has key of autoStart, set it else set to false
-    if(props.launchContext["autoStart"]){
+    if (props.launchContext["autoStart"]) {
       forceEnableAutoStart = props.launchContext["autoStart"] as boolean;
-    }else{
-      if(props.launchContext["img"]){
-        forceEnableAutoStart = true // ocr hack
-      }else{
-        forceEnableAutoStart = false
+    } else {
+      if (props.launchContext["img"]) {
+        forceEnableAutoStart = true; // ocr hack
+      } else {
+        forceEnableAutoStart = false;
       }
     }
 
-    if(props.launchContext["loadSelected"]){
+    if (props.launchContext["loadSelected"]) {
       forceEnableAutoLoadSelected = props.launchContext["loadSelected"] as boolean;
-    }else{
-      forceEnableAutoLoadSelected = false
+    } else {
+      forceEnableAutoLoadSelected = false;
     }
 
-    if(props.launchContext["loadClipboard"]){
+    if (props.launchContext["loadClipboard"]) {
       forceEnableAutoLoadClipboard = props.launchContext["loadClipboard"] as boolean;
-    }else{
-      forceEnableAutoLoadClipboard = false
+    } else {
+      forceEnableAutoLoadClipboard = false;
     }
-
   } else {
     initialQuery = props.fallbackText;
   }
@@ -84,11 +84,14 @@ export default function getBase(
     provider: string;
   }>();
 
-  let provider = undefined;
+  let provider: Provider | undefined;
+  let providerHook: ProvidersHook | null = null;
   if (providerName == "custom") {
-    const providers = useProviders();
-    if (!providers.isLoading) {
-      provider = providers.selected ? createProvider(providers.selected.type, providers.selected.props) : undefined;
+    providerHook = useProviders();
+    if (!providerHook.isLoading) {
+      provider = providerHook?.selected
+        ? createProvider(providerHook.selected.type, providerHook.selected.props)
+        : undefined;
       if (!provider) {
         launchCommand({
           name: "provider",
@@ -141,6 +144,7 @@ export default function getBase(
           query={query}
           history={history}
           provider={provider}
+          providerHook={providerHook}
           mode={mode}
           setMode={setMode}
           setSelectedId={setSelectedId}

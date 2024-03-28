@@ -54,7 +54,7 @@ export default class extends Provider {
     }
   }
 
-  messages(prompt: Prompt) {
+  messages(prompt: Prompt): { system: string; messages: Anthropic.MessageParam[] } {
     const { rolePrompt, assistantPrompts, commandPrompt, contentPrompt } = prompt;
     return {
       system: rolePrompt + "\n" + assistantPrompts.join("\n") + commandPrompt,

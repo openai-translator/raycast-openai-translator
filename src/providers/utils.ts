@@ -23,7 +23,10 @@ export async function* fetchSSE(input: string, options: RequestInit) {
       const errorBody = await resp.json();
       throw errorBody;
     }
-    yield* resp.body;
+    const rs = resp.body;
+    if (rs) {
+      yield* rs;
+    }
   } catch (error) {
     console.debug(error);
     if (ctrl.signal.aborted) {
@@ -51,7 +54,8 @@ export class SSETransform extends Transform {
   }
 }
 
-export function getErrorText(err): string {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export function getErrorText(err: any): string {
   if (err instanceof Array) {
     err = err[0];
   }

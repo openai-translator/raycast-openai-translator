@@ -663,6 +663,7 @@
     "@types/capitalize": "^2.0.0",
     "@types/node": "20.8.10",
     "@types/react": "18.2.27",
+    "@types/stream-json": "^1.7.7",
     "@types/uuid": "^9.0.1",
     "eslint": "^8.51.0",
     "prettier": "^3.0.3",

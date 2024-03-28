@@ -5,7 +5,8 @@ import { Provider, Message } from "../base";
 import { Prompt } from "../prompt";
 import { TranslateQuery, ProviderProps } from "../types";
 import { fetchSSE, SSETransform } from "../utils";
-import { Readable, compose } from "stream";
+// @ts-ignore: has no exported member 'compose'
+import { compose } from "stream";
 
 export default class extends Provider {
   protected model: string | undefined;

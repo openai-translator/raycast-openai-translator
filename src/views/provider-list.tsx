@@ -12,11 +12,12 @@ export function ProviderList(props: ProviderListProps) {
   const isSelecting = (record: Record) => {
     return hook.selected?.id == record.id;
   };
-  console.log(hook.data);
 
-  const createForm = (target) => <ProviderForm record={target} hook={hook} onDone={pop} onCancel={pop} />;
+  const createForm = (target: Record | undefined) => (
+    <ProviderForm record={target} hook={hook} onDone={pop} onCancel={pop} />
+  );
 
-  const providerActionPanel = (item) => (
+  const providerActionPanel = (item: Record) => (
     <ActionPanel>
       {item.id != hook.selected?.id && (
         <Action
@@ -55,9 +56,18 @@ export function ProviderList(props: ProviderListProps) {
     </ActionPanel>
   );
 
-  return hook.isLoading || hook.data.length != 0 ? (
+  const emptyData = () => {
+    showToast({
+      title: "Custom providers is empty",
+      message: "at least 1 provider is required.",
+      style: Toast.Style.Failure,
+    });
+    return <ProviderForm record={undefined} hook={hook} />;
+  };
+
+  return hook.isLoading || hook.data?.length != 0 ? (
     <List isLoading={hook.isLoading}>
-      {hook.data.map((item) => (
+      {hook.data?.map((item) => (
         <List.Item
           id={item.id}
           key={item.id}
@@ -69,10 +79,6 @@ export function ProviderList(props: ProviderListProps) {
       ))}
     </List>
   ) : (
-    showToast({
-      title: "Custom providers is empty",
-      message: "at least 1 provider is required.",
-      style: Toast.Style.Failure,
-    }) && <ProviderForm record={undefined} hook={hook} />
+    emptyData()
   );
 }

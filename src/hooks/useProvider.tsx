@@ -10,7 +10,7 @@ export interface Record {
 }
 
 export interface ProvidersHook {
-  data: Record[] | undefined;
+  data: Record[];
   isLoading: boolean;
   addOrUpdate: (arg: Record) => Promise<void>;
   remove: (arg: Record) => Promise<void>;

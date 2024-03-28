@@ -15,8 +15,8 @@ import { Record, ProvidersHook } from "../hooks/useProvider";
 export interface ProviderFormProps {
   record: Record | undefined;
   hook: ProvidersHook;
-  onCancel: () => void;
-  onDone: () => void;
+  onCancel?: () => void;
+  onDone?: () => void;
 }
 
 const providers: { value: string; title: string; config: IConfig }[] = [
@@ -39,18 +39,18 @@ function providerByConfig(config: IConfig): { value: string; title: string; conf
 }
 
 function recordByName(name: string, hook: ProvidersHook): Record | undefined {
-  return hook.data.find((r) => r.props.name === name);
+  return hook.data?.find((r) => r.props.name === name);
 }
 
 function nextValidName(config: IConfig, hook: ProvidersHook): string {
   const provider = providerByConfig(config);
   const type = provider.value;
   const records = hook.data;
-  const names = records.map((r) => r.props.name);
+  const names = records?.map((r) => r.props.name);
   let name = provider.title;
   let i = 1;
   let existInGlobal = type == "openai";
-  while (names.includes(name) || existInGlobal) {
+  while (names?.includes(name) || existInGlobal) {
     existInGlobal = false;
     name = `${provider.title} ${i}`;
     i++;
@@ -150,7 +150,7 @@ export const ProviderForm = (props: ProviderFormProps) => {
     return false;
   }
 
-  function submitForm(values) {
+  function submitForm(values: { customModel: string; entrypoint: string; model: string }) {
     // check api key
     if (config.requireApiKey && (!apikey || apikey.length == 0)) {
       setAPIKeyError("API Key is required");
@@ -212,9 +212,7 @@ export const ProviderForm = (props: ProviderFormProps) => {
               value={provider.value}
               title={provider.title}
               icon={{ source: `ic_${provider.value}.png` }}
-            >
-              {provider.title}
-            </Form.Dropdown.Item>
+            />
           ))}
         </Form.Dropdown>
       )}
@@ -225,7 +223,7 @@ export const ProviderForm = (props: ProviderFormProps) => {
           value={name}
           error={nameError}
           onBlur={(event) => {
-            const value = event.target.value;
+            const value = event.target.value as string;
             checkNameValid(value);
           }}
           onChange={(value) => {

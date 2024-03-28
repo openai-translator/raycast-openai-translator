@@ -1,6 +1,15 @@
 import { IConfig, IModel } from "../types";
 import fetch from "node-fetch";
 
+type ModelData = {
+  models: [
+    {
+      supportedGenerationMethods: string[];
+      name: string;
+    },
+  ];
+};
+
 const config: IConfig = {
   requireModel: true,
   defaultModel: {
@@ -14,7 +23,7 @@ const config: IConfig = {
     if (apikey) {
       const resp = await fetch(`${this.defaultEntrypoint}?key=${apikey}`);
       if (resp.status == 200) {
-        const data = await resp.json();
+        const data = (await resp.json()) as ModelData;
         return data.models
           .filter((m) => m.supportedGenerationMethods.includes("generateContent"))
           .map((m) => {
