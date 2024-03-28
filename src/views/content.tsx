@@ -13,11 +13,15 @@ import { DetailView } from "./detail";
 import { EmptyView } from "./empty";
 import { getErrorText } from "../providers/utils";
 import { Provider } from "../providers/base";
+import { getProviderActionSection } from "../actions/provider";
+import { ProvidersHook } from "../hooks/useProvider";
+import { createProvider } from "../providers";
 
 export interface ContentViewProps {
   query: QueryHook;
   history: HistoryHook;
   provider: Provider;
+  providerHook: ProvidersHook | null;
   mode: TranslateMode;
   setMode: (value: TranslateMode) => void;
   setSelectedId: (value: string) => void;
@@ -49,14 +53,15 @@ const { alwayShowMetadata } = getPreferenceValues<{
 }>();
 
 export const ContentView = (props: ContentViewProps) => {
-  const { query, history, provider, mode, setMode, setSelectedId, setIsInit, setIsEmpty } = props;
+  const { query, history, provider, providerHook, mode, setMode, setSelectedId, setIsInit, setIsEmpty } = props;
   const agent = useProxy();
   const [data, setData] = useState<ViewItem[]>();
   const [querying, setQuerying] = useState<Querying | null>();
   const [finishReason, setFinishReason] = useState<FinishReason | null>();
   const [translatedText, setTranslatedText] = useState("");
   const [showMetadata, setShowMetadata] = useState(alwayShowMetadata);
-
+  const [activeRecord, setActiveRecord] = useState({ provider, id: providerHook?.selected?.id });
+  const activeProvider = activeRecord.provider;
   function updateData() {
     if (history.data) {
       const sortedResults = history.data.sort(
@@ -94,7 +99,7 @@ export const ContentView = (props: ContentViewProps) => {
         error: message,
       },
       ocrImg: img,
-      provider: provider.name,
+      provider: activeProvider.name,
     };
     history.add(record);
     setFinishReason(null);
@@ -119,7 +124,7 @@ export const ContentView = (props: ContentViewProps) => {
         text: newText,
       },
       ocrImg: img,
-      provider: provider.name,
+      provider: activeProvider.name,
     };
     history.add(record);
     setFinishReason(null);
@@ -173,7 +178,7 @@ export const ContentView = (props: ContentViewProps) => {
     setQuerying(_querying);
     query.updateText("");
     try {
-      const translationStream = provider.translate(_querying.query);
+      const translationStream = activeProvider.translate(_querying.query);
       for await (const message of translationStream) {
         console.debug("=====ui====");
         console.debug(message);
@@ -278,6 +283,13 @@ export const ContentView = (props: ContentViewProps) => {
       {getModeActionSection((mode) => {
         setMode(mode);
       })}
+      {providerHook &&
+        getProviderActionSection(providerHook, activeRecord.id, (record) => {
+          setActiveRecord({
+            provider: createProvider(record.type, record.props),
+            id: record.id,
+          });
+        })}
       <ActionPanel.Section title="Options">
         <Action
           title={showMetadata ? "Hide Metadata" : "Show Metadata"}
@@ -347,7 +359,7 @@ export const ContentView = (props: ContentViewProps) => {
                 mode={querying ? querying.query.mode : "translate"}
                 ocrImg={query.ocrImage}
                 to={query.to}
-                provider={provider.name}
+                provider={activeProvider.name}
               />
             }
           />
