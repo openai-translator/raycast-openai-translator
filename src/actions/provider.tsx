@@ -10,7 +10,7 @@ export const getProviderActionSection = (
     return activeId == record.id;
   };
   return (
-    <ActionPanel.Submenu title="Provider" icon={Icon.Box} shortcut={{ modifiers: ["cmd"], key: "p" }}>
+    <ActionPanel.Submenu title="Provider" icon={Icon.Box} shortcut={{ modifiers: ["cmd", "ctrl"], key: "p" }}>
       <Action
         title="Edit..."
         icon={Icon.Pencil}
