@@ -8,6 +8,15 @@
   - Groq
   - Moonshot
   - Ollama
+- More OCR Language Support for macOS 14
+  - 粤语（简体）
+  - 粵語（正體）
+  - 한국어
+  - 日本語
+  - Русский
+  - Українська
+  - ภาษาไทย
+  - Tiếng Việt
 - Custom model support for OpenAI by @Sped0n
 - Added ability to switch providers within the content view
 - Fixed History issue

@@ -180,6 +180,38 @@
             {
               "value": "zh-Hant",
               "title": "正體中文"
+            },
+            {
+              "value": "yue-Hans",
+              "title": "粤语（简体）"
+            },
+            {
+              "value": "yue-Hant",
+              "title": "粵語（正體）"
+            },
+            {
+              "value": "ko-KR",
+              "title": "한국어"
+            },
+            {
+              "value": "ja-JP",
+              "title": "日本語"
+            },
+            {
+              "value": "ru-RU",
+              "title": "Русский"
+            },
+            {
+              "value": "uk-UA",
+              "title": "Українська"
+            },
+            {
+              "value": "th-TH",
+              "title": "ภาษาไทย"
+            },
+            {
+              "value": "vi-VT",
+              "title": "Tiếng Việt"
             }
           ]
         },
