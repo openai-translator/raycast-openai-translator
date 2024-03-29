@@ -1,5 +1,19 @@
 # OpenAI Translator Changelog
 
+## [Rewrite Multiple LLM Provider] - 2024-03-29
+
+- More LLM Provider Support:
+  - Gemini
+  - Claude AI
+  - Groq
+  - Moonshot
+  - Ollama
+- Custom model support for OpenAI by @Sped0n
+- Added ability to switch providers within the content view
+- Fixed History issue
+- Fixed content refresh issue
+- Remove PaLM2 support
+
 ## [Toggle metadata visiability] - 2023-09-14
 
 - Add preference and action to show/hide metadata in DetailView by @aiyogg
