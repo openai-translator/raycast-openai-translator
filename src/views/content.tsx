@@ -180,8 +180,8 @@ export const ContentView = (props: ContentViewProps) => {
     try {
       const translationStream = activeProvider.translate(_querying.query);
       for await (const message of translationStream) {
-        console.debug("=====ui====");
-        console.debug(message);
+        // console.debug("=====ui====");
+        // console.debug(message);
         if (typeof message === "string") {
           setFinishReason({
             reason: message,

@@ -30,6 +30,7 @@ function encrypt(plaintext: string): string {
 }
 
 export function useProviders(): ProvidersHook {
+  //FIXME: data will reset to empty array when any exception occurs in init useEffect
   const [data, setData] = useState<Record[]>([]);
   const countRef = useRef(data);
   const [isLoading, setLoading] = useState<boolean>(true);
